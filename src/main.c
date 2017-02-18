@@ -57,6 +57,106 @@ static void Print_Buffer(uint8_t* buff, uint8_t buff_size) {
     }
 }
 
+/**
+ * @details prints the state of charge (measured in percentage) to the terminal
+ *
+ * @param soc_percentage state of charge, measured in percentage
+ */
+static void print_soc_percentage(uint16_t soc_percentage) {
+	const uint8_t soc_digit_count = 8;
+        char soc_percentage_string[soc_digit_count];
+        const uint8_t base_10 = 10;
+
+
+	itoa(soc_percentage, soc_percentage_string, base_10);
+        DEBUG_Print("BMS SOC Percentage: ");
+        DEBUG_Print(soc_percentage_string);
+        DEBUG_Print("\r\n");
+}
+
+/**
+ * @details reads incoming CAN messages and prints information to the terminal
+ */
+void Process_CAN_Inputs() {	
+	uint32_t ret;
+	BMS_HEARTBEAT_T bms_heartbeat;
+	BMS_DISCHARGE_RESPONSE_T bms_discharge_response;
+
+	ret = CAN_Receive(&rx_msg);
+
+        if (ret == NO_CAN_ERROR) {
+        	switch (rx_msg.mode_id) {
+                	case BMS_HEARTBEAT__id:
+                        	DEBUG_Print("BMS Heartbeat\r\n");
+                        	CAN_MakeBMSHeartbeat(&bms_heartbeat, &rx_msg);
+                        	switch (bms_heartbeat.state) {
+                                	case ____BMS_HEARTBEAT__STATE__INIT:
+                                        	DEBUG_Print("BMS State: Init\r\n");
+                                                print_soc_percentage(bms_heartbeat.soc_percentage);
+                                                break;
+                                        case ____BMS_HEARTBEAT__STATE__STANDBY:
+                                                DEBUG_Print("BMS State: Standby\r\n");
+                                                print_soc_percentage(bms_heartbeat.soc_percentage);
+                                                break;
+                                        case ____BMS_HEARTBEAT__STATE__CHARGE:
+                                                DEBUG_Print("BMS State: Charge\r\n");
+                                                print_soc_percentage(bms_heartbeat.soc_percentage);
+                                                break;
+                               	        case ____BMS_HEARTBEAT__STATE__BALANCE:
+                                                DEBUG_Print("BMS State: Balance");
+                                                print_soc_percentage(bms_heartbeat.soc_percentage);
+                                                break;
+                                        case ____BMS_HEARTBEAT__STATE__DISCHARGE:
+                                                DEBUG_Print("BMS State: Discharge");
+                                                print_soc_percentage(bms_heartbeat.soc_percentage);
+                                                break;
+                                        case ____BMS_HEARTBEAT__STATE__ERROR:
+                                                DEBUG_Print("BMS State: Error");
+                                                print_soc_percentage(bms_heartbeat.soc_percentage);
+                                                break;
+                                        default:
+                                                DEBUG_Print("Unexpected BMS State. You should never reach here");
+                                                break;
+                                        }
+                                        break;
+
+			case BMS_DISCHARGE_RESPONSE__id:
+                        	DEBUG_Print("BMS Discharge Response\r\n");
+                      	        CAN_MakeBMSDischargeResponse(&bms_discharge_response, &rx_msg);
+                                switch (bms_discharge_response.discharge_response) {
+	                                case ____BMS_DISCHARGE_RESPONSE__DISCHARGE_RESPONSE__NOT_READY:
+                                        	DEBUG_Print("Not Ready");
+                                                break;
+                                        case ____BMS_DISCHARGE_RESPONSE__DISCHARGE_RESPONSE__READY:
+                                                DEBUG_Print("Ready");
+                                                break;
+                                        }
+                                        break;
+
+                        case BMS_PACK_STATUS__id:
+        	                DEBUG_Print("BMS Pack Status");
+       	                        //TODO
+                                break;
+                        case BMS_CELL_TEMPS__id:
+                                DEBUG_Print("BMS Cell Temps");
+                                //TODO
+                       	        break;
+                        case BMS_ERRORS__id:
+                                DEBUG_Print("BMS Errors");
+                                //TODO
+                                break;
+                        default:
+                        	DEBUG_Print("Unrecognized CAN message");
+		}
+	}
+}
+
+/**
+ * Transmits CAN messages
+ */
+void Process_CAN_Outputs() {
+	// TODO
+}
 
 int main(void) {
 	SystemCoreClockUpdate();
@@ -82,15 +182,7 @@ int main(void) {
 	DEBUG_Print("Started up\n\r");
 
 	CAN_Init(500000);
-
-	uint32_t ret;
-	BMS_HEARTBEAT_T bms_heartbeat;
-
-	const uint8_t soc_digit_count = 8;
-        char soc_percentage_string[soc_digit_count];
-        const uint8_t base_10 = 10;
-
-
+	
 	while (1) {
 		//read can message
 			//switch (message ID)
@@ -109,43 +201,8 @@ int main(void) {
             		reset_can_peripheral = false;
         	}
 
-		ret = CAN_Receive(&rx_msg);
-		
-		if (ret == NO_CAN_ERROR) {
-			switch (rx_msg.mode_id) {
-				case BMS_HEARTBEAT__id:
-					DEBUG_Print("BMS Heartbeat\r\n");
-					CAN_MakeBMSHeartbeat(&bms_heartbeat, &rx_msg);
-					switch (bms_heartbeat.state) {
-						case ____BMS_HEARTBEAT__STATE__INIT:
-							DEBUG_Print("BMS State: Init\r\n");
-							itoa(bms_heartbeat.soc_percentage, soc_percentage_string, base_10);
-							DEBUG_Print(soc_percentage_string);
-							break;
-						default:
-							break;
-					}
-					break;
-				case BMS_DISCHARGE_RESPONSE__id:
-					DEBUG_Print("BMS Discharge Response\r\n");
-					// TODO
-					break;
-				case BMS_PACK_STATUS__id:
-					DEBUG_Print("BMS Pack Status");
-					//TODO
-					break;
-				case BMS_CELL_TEMPS__id:
-					DEBUG_Print("BMS Cell Temps");
-					//TODO
-					break;
-				case BMS_ERRORS__id:
-					DEBUG_Print("BMS Errors");
-					//TODO
-					break;
-				default:
-					DEBUG_Print("Unrecognized CAN message");
-			}
-		}
+		Process_CAN_Inputs();
+		Process_CAN_Outputs();
 
 //		if (msTicks % 1000 == 0){
 //            		// recieve message if there is a message

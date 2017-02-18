@@ -1,0 +1,2 @@
+- recompile can_constants.h
+- detect other CAN messages sent by the BMS

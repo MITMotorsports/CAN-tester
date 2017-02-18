@@ -13,7 +13,7 @@ Disassembly of section .text:
   2c:	000000e5 	.word	0x000000e5
 	...
   38:	000000e7 	.word	0x000000e7
-  3c:	0000049d 	.word	0x0000049d
+  3c:	000004e1 	.word	0x000004e1
   40:	000000eb 	.word	0x000000eb
   44:	000000eb 	.word	0x000000eb
   48:	000000eb 	.word	0x000000eb
@@ -78,14 +78,14 @@ Disassembly of section .text:
 
 #ifndef __NO_SYSTEM_INIT
     bl  SystemInit
-  d0:	f000 faa6 	bl	620 <SystemInit>
+  d0:	f000 faf8 	bl	6c4 <SystemInit>
 #endif
 
 #ifndef __START
 #define __START _start
 #endif
     bl  __START
-  d4:	f000 f9ea 	bl	4ac <main>
+  d4:	f000 fab0 	bl	638 <main>
     ldr r1, =__bss_start__
   d8:	10000108 	.word	0x10000108
     ldr r2, =__bss_end__
@@ -240,7 +240,7 @@ STATIC INLINE uint32_t Chip_Clock_GetMainOscRate(void)
  154:	3101      	adds	r1, #1
  156:	0049      	lsls	r1, r1, #1
  158:	5898      	ldr	r0, [r3, r2]
- 15a:	f000 faaf 	bl	6bc <__udivsi3>
+ 15a:	f000 fb05 	bl	768 <__udivsi3>
 		break;
  15e:	e7da      	b.n	116 <Chip_Clock_GetMainClockRate+0x1a>
  160:	231f      	movs	r3, #31
@@ -255,8 +255,8 @@ STATIC INLINE uint32_t Chip_Clock_GetMainOscRate(void)
  16e:	e7d2      	b.n	116 <Chip_Clock_GetMainClockRate+0x1a>
  170:	40048000 	.word	0x40048000
  174:	00b71b00 	.word	0x00b71b00
- 178:	000009e0 	.word	0x000009e0
- 17c:	00000980 	.word	0x00000980
+ 178:	00000aa4 	.word	0x00000aa4
+ 17c:	00000a2c 	.word	0x00000a2c
 
 00000180 <Chip_Clock_GetSystemClockRate>:
 
@@ -269,7 +269,7 @@ uint32_t Chip_Clock_GetSystemClockRate(void)
  182:	f7ff ffbb 	bl	fc <Chip_Clock_GetMainClockRate>
  186:	4b02      	ldr	r3, [pc, #8]	; (190 <Chip_Clock_GetSystemClockRate+0x10>)
  188:	6f99      	ldr	r1, [r3, #120]	; 0x78
- 18a:	f000 fa97 	bl	6bc <__udivsi3>
+ 18a:	f000 faed 	bl	768 <__udivsi3>
 }
  18e:	bd10      	pop	{r4, pc}
  190:	40048000 	.word	0x40048000
@@ -335,7 +335,7 @@ STATIC INLINE int RingBuffer_IsFull(RINGBUFF_T *RingBuff)
 
 	ptr += RB_INDH(RingBuff) * RingBuff->itemSz;
  1b8:	0010      	movs	r0, r2
- 1ba:	f000 fb05 	bl	7c8 <__aeabi_uidivmod>
+ 1ba:	f000 fb5b 	bl	874 <__aeabi_uidivmod>
  1be:	68a7      	ldr	r7, [r4, #8]
 	uint8_t *ptr = RingBuff->data;
  1c0:	6825      	ldr	r5, [r4, #0]
@@ -347,7 +347,7 @@ STATIC INLINE int RingBuffer_IsFull(RINGBUFF_T *RingBuff)
  1c6:	1868      	adds	r0, r5, r1
 	memcpy(ptr, data, RingBuff->itemSz);
  1c8:	0031      	movs	r1, r6
- 1ca:	f000 fb1f 	bl	80c <memcpy>
+ 1ca:	f000 fb75 	bl	8b8 <memcpy>
 	RingBuff->head++;
 
 	return 1;
@@ -385,7 +385,7 @@ int RingBuffer_Pop(RINGBUFF_T *RingBuff, void *data)
 	ptr += RB_INDT(RingBuff) * RingBuff->itemSz;
  1e8:	0018      	movs	r0, r3
  1ea:	6861      	ldr	r1, [r4, #4]
- 1ec:	f000 faec 	bl	7c8 <__aeabi_uidivmod>
+ 1ec:	f000 fb42 	bl	874 <__aeabi_uidivmod>
  1f0:	68a7      	ldr	r7, [r4, #8]
 	uint8_t *ptr = RingBuff->data;
  1f2:	6825      	ldr	r5, [r4, #0]
@@ -397,7 +397,7 @@ int RingBuffer_Pop(RINGBUFF_T *RingBuff, void *data)
  1f8:	1869      	adds	r1, r5, r1
 	memcpy(data, ptr, RingBuff->itemSz);
  1fa:	0030      	movs	r0, r6
- 1fc:	f000 fb06 	bl	80c <memcpy>
+ 1fc:	f000 fb5c 	bl	8b8 <memcpy>
 	RingBuff->tail++;
  
 	return 1;
@@ -533,7 +533,7 @@ uint32_t Chip_UART_SetBaud(LPC_USART_T *pUART, uint32_t baudrate)
 	clkin = Chip_Clock_GetMainClockRate();
  26c:	0005      	movs	r5, r0
 	div = clkin / (baudrate * 16);
- 26e:	f000 fa25 	bl	6bc <__udivsi3>
+ 26e:	f000 fa7b 	bl	768 <__udivsi3>
  272:	23ff      	movs	r3, #255	; 0xff
  274:	001e      	movs	r6, r3
  276:	0001      	movs	r1, r0
@@ -563,7 +563,7 @@ uint32_t Chip_UART_SetBaud(LPC_USART_T *pUART, uint32_t baudrate)
 
 	return clkin / div;
  290:	0028      	movs	r0, r5
- 292:	f000 fa13 	bl	6bc <__udivsi3>
+ 292:	f000 fa69 	bl	768 <__udivsi3>
 }
  296:	bd70      	pop	{r4, r5, r6, pc}
 
@@ -658,7 +658,7 @@ void Baudrate_Calculate(uint32_t baud_rate, uint32_t *can_api_timing_cfg) {
  31c:	f7ff feee 	bl	fc <Chip_Clock_GetMainClockRate>
 	clk_per_bit = pClk / baud_rate;
  320:	0029      	movs	r1, r5
- 322:	f000 f9cb 	bl	6bc <__udivsi3>
+ 322:	f000 fa21 	bl	768 <__udivsi3>
 	for (div = 0; div <= 15; div++) {
  326:	2300      	movs	r3, #0
 	clk_per_bit = pClk / baud_rate;
@@ -871,7 +871,7 @@ __STATIC_INLINE void NVIC_EnableIRQ(IRQn_Type IRQn)
  438:	10000210 	.word	0x10000210
  43c:	10000124 	.word	0x10000124
  440:	10000150 	.word	0x10000150
- 444:	000009c0 	.word	0x000009c0
+ 444:	00000a6c 	.word	0x00000a6c
  448:	1fff1ff8 	.word	0x1fff1ff8
  44c:	e000e100 	.word	0xe000e100
  450:	100002d0 	.word	0x100002d0
@@ -929,792 +929,921 @@ CAN_ERROR_T CAN_Receive(CCAN_MSG_OBJ_T* user_buffer) {
  494:	10000110 	.word	0x10000110
  498:	1000010c 	.word	0x1000010c
 
-0000049c <SysTick_Handler>:
-/*****************************************************************************
- * Private functions
- ****************************************************************************/
+0000049c <print_soc_percentage>:
+/**
+ * @details prints the state of charge (measured in percentage) to the terminal
+ *
+ * @param soc_percentage state of charge, measured in percentage
+ */
+static void print_soc_percentage(uint16_t soc_percentage) {
+ 49c:	b510      	push	{r4, lr}
+        char soc_percentage_string[soc_digit_count];
+        const uint8_t base_10 = 10;
 
-void SysTick_Handler(void) {
+
+	itoa(soc_percentage, soc_percentage_string, base_10);
+        DEBUG_Print("BMS SOC Percentage: ");
+ 49e:	4c0d      	ldr	r4, [pc, #52]	; (4d4 <print_soc_percentage+0x38>)
+static void print_soc_percentage(uint16_t soc_percentage) {
+ 4a0:	b082      	sub	sp, #8
+	itoa(soc_percentage, soc_percentage_string, base_10);
+ 4a2:	4669      	mov	r1, sp
+ 4a4:	220a      	movs	r2, #10
+ 4a6:	f000 fa03 	bl	8b0 <itoa>
+        DEBUG_Print("BMS SOC Percentage: ");
+ 4aa:	2214      	movs	r2, #20
+ 4ac:	490a      	ldr	r1, [pc, #40]	; (4d8 <print_soc_percentage+0x3c>)
+ 4ae:	0020      	movs	r0, r4
+ 4b0:	f7ff fec0 	bl	234 <Chip_UART_SendBlocking>
+        DEBUG_Print(soc_percentage_string);
+ 4b4:	4668      	mov	r0, sp
+ 4b6:	f000 fa41 	bl	93c <strlen>
+ 4ba:	4669      	mov	r1, sp
+ 4bc:	0002      	movs	r2, r0
+ 4be:	0020      	movs	r0, r4
+ 4c0:	f7ff feb8 	bl	234 <Chip_UART_SendBlocking>
+        DEBUG_Print("\r\n");
+ 4c4:	2202      	movs	r2, #2
+ 4c6:	4905      	ldr	r1, [pc, #20]	; (4dc <print_soc_percentage+0x40>)
+ 4c8:	0020      	movs	r0, r4
+ 4ca:	f7ff feb3 	bl	234 <Chip_UART_SendBlocking>
+}
+ 4ce:	b002      	add	sp, #8
+ 4d0:	bd10      	pop	{r4, pc}
+ 4d2:	46c0      	nop			; (mov r8, r8)
+ 4d4:	40008000 	.word	0x40008000
+ 4d8:	00000bec 	.word	0x00000bec
+ 4dc:	00000c04 	.word	0x00000c04
+
+000004e0 <SysTick_Handler>:
     msTicks++;
- 49c:	4a02      	ldr	r2, [pc, #8]	; (4a8 <SysTick_Handler+0xc>)
- 49e:	6813      	ldr	r3, [r2, #0]
- 4a0:	3301      	adds	r3, #1
- 4a2:	6013      	str	r3, [r2, #0]
+ 4e0:	4a02      	ldr	r2, [pc, #8]	; (4ec <SysTick_Handler+0xc>)
+ 4e2:	6813      	ldr	r3, [r2, #0]
+ 4e4:	3301      	adds	r3, #1
+ 4e6:	6013      	str	r3, [r2, #0]
 }
- 4a4:	4770      	bx	lr
- 4a6:	46c0      	nop			; (mov r8, r8)
- 4a8:	10000300 	.word	0x10000300
+ 4e8:	4770      	bx	lr
+ 4ea:	46c0      	nop			; (mov r8, r8)
+ 4ec:	10000300 	.word	0x10000300
 
-000004ac <main>:
-        Chip_UART_SendBlocking(LPC_USART, str, 2);
-    }
+000004f0 <Process_CAN_Inputs>:
+
+/**
+ * @details reads incoming CAN messages and prints information to the terminal
+ */
+void Process_CAN_Inputs() {	
+ 4f0:	b530      	push	{r4, r5, lr}
+	uint32_t ret;
+	BMS_HEARTBEAT_T bms_heartbeat;
+	BMS_DISCHARGE_RESPONSE_T bms_discharge_response;
+
+	ret = CAN_Receive(&rx_msg);
+ 4f2:	4c3d      	ldr	r4, [pc, #244]	; (5e8 <Process_CAN_Inputs+0xf8>)
+void Process_CAN_Inputs() {	
+ 4f4:	b083      	sub	sp, #12
+	ret = CAN_Receive(&rx_msg);
+ 4f6:	0020      	movs	r0, r4
+ 4f8:	f7ff ffb2 	bl	460 <CAN_Receive>
+
+        if (ret == NO_CAN_ERROR) {
+ 4fc:	2800      	cmp	r0, #0
+ 4fe:	d11d      	bne.n	53c <Process_CAN_Inputs+0x4c>
+        	switch (rx_msg.mode_id) {
+ 500:	2298      	movs	r2, #152	; 0x98
+ 502:	6823      	ldr	r3, [r4, #0]
+ 504:	0092      	lsls	r2, r2, #2
+ 506:	4293      	cmp	r3, r2
+ 508:	d03d      	beq.n	586 <Process_CAN_Inputs+0x96>
+ 50a:	d819      	bhi.n	540 <Process_CAN_Inputs+0x50>
+ 50c:	2b60      	cmp	r3, #96	; 0x60
+ 50e:	d023      	beq.n	558 <Process_CAN_Inputs+0x68>
+ 510:	2b61      	cmp	r3, #97	; 0x61
+ 512:	d13e      	bne.n	592 <Process_CAN_Inputs+0xa2>
+                                                break;
+                                        }
+                                        break;
+
+			case BMS_DISCHARGE_RESPONSE__id:
+                        	DEBUG_Print("BMS Discharge Response\r\n");
+ 514:	2218      	movs	r2, #24
+ 516:	4935      	ldr	r1, [pc, #212]	; (5ec <Process_CAN_Inputs+0xfc>)
+                      	        CAN_MakeBMSDischargeResponse(&bms_discharge_response, &rx_msg);
+ 518:	ad01      	add	r5, sp, #4
+                        	DEBUG_Print("BMS Discharge Response\r\n");
+ 51a:	4835      	ldr	r0, [pc, #212]	; (5f0 <Process_CAN_Inputs+0x100>)
+ 51c:	f7ff fe8a 	bl	234 <Chip_UART_SendBlocking>
+                      	        CAN_MakeBMSDischargeResponse(&bms_discharge_response, &rx_msg);
+ 520:	0021      	movs	r1, r4
+ 522:	0028      	movs	r0, r5
+ 524:	f000 f91c 	bl	760 <CAN_MakeBMSDischargeResponse>
+                                switch (bms_discharge_response.discharge_response) {
+ 528:	782b      	ldrb	r3, [r5, #0]
+ 52a:	2b00      	cmp	r3, #0
+ 52c:	d050      	beq.n	5d0 <Process_CAN_Inputs+0xe0>
+ 52e:	2b01      	cmp	r3, #1
+ 530:	d104      	bne.n	53c <Process_CAN_Inputs+0x4c>
+	                                case ____BMS_DISCHARGE_RESPONSE__DISCHARGE_RESPONSE__NOT_READY:
+                                        	DEBUG_Print("Not Ready");
+                                                break;
+                                        case ____BMS_DISCHARGE_RESPONSE__DISCHARGE_RESPONSE__READY:
+                                                DEBUG_Print("Ready");
+ 532:	2205      	movs	r2, #5
+ 534:	492f      	ldr	r1, [pc, #188]	; (5f4 <Process_CAN_Inputs+0x104>)
+ 536:	482e      	ldr	r0, [pc, #184]	; (5f0 <Process_CAN_Inputs+0x100>)
+ 538:	f7ff fe7c 	bl	234 <Chip_UART_SendBlocking>
+                                break;
+                        default:
+                        	DEBUG_Print("Unrecognized CAN message");
+		}
+	}
 }
+ 53c:	b003      	add	sp, #12
+ 53e:	bd30      	pop	{r4, r5, pc}
+        	switch (rx_msg.mode_id) {
+ 540:	4a2d      	ldr	r2, [pc, #180]	; (5f8 <Process_CAN_Inputs+0x108>)
+ 542:	4293      	cmp	r3, r2
+ 544:	d019      	beq.n	57a <Process_CAN_Inputs+0x8a>
+ 546:	4a2d      	ldr	r2, [pc, #180]	; (5fc <Process_CAN_Inputs+0x10c>)
+ 548:	4293      	cmp	r3, r2
+ 54a:	d122      	bne.n	592 <Process_CAN_Inputs+0xa2>
+                                DEBUG_Print("BMS Errors");
+ 54c:	220a      	movs	r2, #10
+ 54e:	492c      	ldr	r1, [pc, #176]	; (600 <Process_CAN_Inputs+0x110>)
+ 550:	4827      	ldr	r0, [pc, #156]	; (5f0 <Process_CAN_Inputs+0x100>)
+ 552:	f7ff fe6f 	bl	234 <Chip_UART_SendBlocking>
+ 556:	e7f1      	b.n	53c <Process_CAN_Inputs+0x4c>
+                        	DEBUG_Print("BMS Heartbeat\r\n");
+ 558:	220f      	movs	r2, #15
+ 55a:	492a      	ldr	r1, [pc, #168]	; (604 <Process_CAN_Inputs+0x114>)
+ 55c:	4824      	ldr	r0, [pc, #144]	; (5f0 <Process_CAN_Inputs+0x100>)
+ 55e:	f7ff fe69 	bl	234 <Chip_UART_SendBlocking>
+                        	CAN_MakeBMSHeartbeat(&bms_heartbeat, &rx_msg);
+ 562:	0021      	movs	r1, r4
+ 564:	a801      	add	r0, sp, #4
+ 566:	f000 f8f3 	bl	750 <CAN_MakeBMSHeartbeat>
+                        	switch (bms_heartbeat.state) {
+ 56a:	466b      	mov	r3, sp
+ 56c:	791b      	ldrb	r3, [r3, #4]
+ 56e:	2b05      	cmp	r3, #5
+ 570:	d834      	bhi.n	5dc <Process_CAN_Inputs+0xec>
+ 572:	4a25      	ldr	r2, [pc, #148]	; (608 <Process_CAN_Inputs+0x118>)
+ 574:	009b      	lsls	r3, r3, #2
+ 576:	58d3      	ldr	r3, [r2, r3]
+ 578:	469f      	mov	pc, r3
+                                DEBUG_Print("BMS Cell Temps");
+ 57a:	220e      	movs	r2, #14
+ 57c:	4923      	ldr	r1, [pc, #140]	; (60c <Process_CAN_Inputs+0x11c>)
+ 57e:	481c      	ldr	r0, [pc, #112]	; (5f0 <Process_CAN_Inputs+0x100>)
+ 580:	f7ff fe58 	bl	234 <Chip_UART_SendBlocking>
+ 584:	e7da      	b.n	53c <Process_CAN_Inputs+0x4c>
+        	                DEBUG_Print("BMS Pack Status");
+ 586:	220f      	movs	r2, #15
+ 588:	4921      	ldr	r1, [pc, #132]	; (610 <Process_CAN_Inputs+0x120>)
+ 58a:	4819      	ldr	r0, [pc, #100]	; (5f0 <Process_CAN_Inputs+0x100>)
+ 58c:	f7ff fe52 	bl	234 <Chip_UART_SendBlocking>
+ 590:	e7d4      	b.n	53c <Process_CAN_Inputs+0x4c>
+                        	DEBUG_Print("Unrecognized CAN message");
+ 592:	2218      	movs	r2, #24
+ 594:	491f      	ldr	r1, [pc, #124]	; (614 <Process_CAN_Inputs+0x124>)
+ 596:	4816      	ldr	r0, [pc, #88]	; (5f0 <Process_CAN_Inputs+0x100>)
+ 598:	f7ff fe4c 	bl	234 <Chip_UART_SendBlocking>
+}
+ 59c:	e7ce      	b.n	53c <Process_CAN_Inputs+0x4c>
+                                                DEBUG_Print("BMS State: Discharge");
+ 59e:	2214      	movs	r2, #20
+ 5a0:	491d      	ldr	r1, [pc, #116]	; (618 <Process_CAN_Inputs+0x128>)
+                                                DEBUG_Print("BMS State: Standby\r\n");
+ 5a2:	4813      	ldr	r0, [pc, #76]	; (5f0 <Process_CAN_Inputs+0x100>)
+ 5a4:	f7ff fe46 	bl	234 <Chip_UART_SendBlocking>
+                                                print_soc_percentage(bms_heartbeat.soc_percentage);
+ 5a8:	466b      	mov	r3, sp
+ 5aa:	88d8      	ldrh	r0, [r3, #6]
+ 5ac:	f7ff ff76 	bl	49c <print_soc_percentage>
+ 5b0:	e7c4      	b.n	53c <Process_CAN_Inputs+0x4c>
+                                                DEBUG_Print("BMS State: Balance");
+ 5b2:	2212      	movs	r2, #18
+ 5b4:	4919      	ldr	r1, [pc, #100]	; (61c <Process_CAN_Inputs+0x12c>)
+ 5b6:	e7f4      	b.n	5a2 <Process_CAN_Inputs+0xb2>
+                                                DEBUG_Print("BMS State: Charge\r\n");
+ 5b8:	2213      	movs	r2, #19
+ 5ba:	4919      	ldr	r1, [pc, #100]	; (620 <Process_CAN_Inputs+0x130>)
+ 5bc:	e7f1      	b.n	5a2 <Process_CAN_Inputs+0xb2>
+                                                DEBUG_Print("BMS State: Standby\r\n");
+ 5be:	2214      	movs	r2, #20
+ 5c0:	4918      	ldr	r1, [pc, #96]	; (624 <Process_CAN_Inputs+0x134>)
+ 5c2:	e7ee      	b.n	5a2 <Process_CAN_Inputs+0xb2>
+                                        	DEBUG_Print("BMS State: Init\r\n");
+ 5c4:	2211      	movs	r2, #17
+ 5c6:	4918      	ldr	r1, [pc, #96]	; (628 <Process_CAN_Inputs+0x138>)
+ 5c8:	e7eb      	b.n	5a2 <Process_CAN_Inputs+0xb2>
+                                                DEBUG_Print("BMS State: Error");
+ 5ca:	2210      	movs	r2, #16
+ 5cc:	4917      	ldr	r1, [pc, #92]	; (62c <Process_CAN_Inputs+0x13c>)
+ 5ce:	e7e8      	b.n	5a2 <Process_CAN_Inputs+0xb2>
+                                        	DEBUG_Print("Not Ready");
+ 5d0:	2209      	movs	r2, #9
+ 5d2:	4917      	ldr	r1, [pc, #92]	; (630 <Process_CAN_Inputs+0x140>)
+ 5d4:	4806      	ldr	r0, [pc, #24]	; (5f0 <Process_CAN_Inputs+0x100>)
+ 5d6:	f7ff fe2d 	bl	234 <Chip_UART_SendBlocking>
+ 5da:	e7af      	b.n	53c <Process_CAN_Inputs+0x4c>
+                                                DEBUG_Print("Unexpected BMS State. You should never reach here");
+ 5dc:	2231      	movs	r2, #49	; 0x31
+ 5de:	4915      	ldr	r1, [pc, #84]	; (634 <Process_CAN_Inputs+0x144>)
+ 5e0:	4803      	ldr	r0, [pc, #12]	; (5f0 <Process_CAN_Inputs+0x100>)
+ 5e2:	f7ff fe27 	bl	234 <Chip_UART_SendBlocking>
+ 5e6:	e7a9      	b.n	53c <Process_CAN_Inputs+0x4c>
+ 5e8:	100002e8 	.word	0x100002e8
+ 5ec:	00000b6c 	.word	0x00000b6c
+ 5f0:	40008000 	.word	0x40008000
+ 5f4:	00000b8c 	.word	0x00000b8c
+ 5f8:	00000261 	.word	0x00000261
+ 5fc:	00000262 	.word	0x00000262
+ 600:	00000bb4 	.word	0x00000bb4
+ 604:	00000aa8 	.word	0x00000aa8
+ 608:	00000a8c 	.word	0x00000a8c
+ 60c:	00000ba4 	.word	0x00000ba4
+ 610:	00000b94 	.word	0x00000b94
+ 614:	00000bc0 	.word	0x00000bc0
+ 618:	00000b0c 	.word	0x00000b0c
+ 61c:	00000af8 	.word	0x00000af8
+ 620:	00000ae4 	.word	0x00000ae4
+ 624:	00000acc 	.word	0x00000acc
+ 628:	00000ab8 	.word	0x00000ab8
+ 62c:	00000b24 	.word	0x00000b24
+ 630:	00000b88 	.word	0x00000b88
+ 634:	00000b38 	.word	0x00000b38
 
+00000638 <main>:
+ */
+void Process_CAN_Outputs() {
+	// TODO
+}
 
 int main(void) {
- 4ac:	b5f0      	push	{r4, r5, r6, r7, lr}
- 4ae:	46de      	mov	lr, fp
- 4b0:	4657      	mov	r7, sl
- 4b2:	464e      	mov	r6, r9
- 4b4:	4645      	mov	r5, r8
- 4b6:	b5e0      	push	{r5, r6, r7, lr}
- 4b8:	b085      	sub	sp, #20
+ 638:	b510      	push	{r4, lr}
 	SystemCoreClockUpdate();
- 4ba:	f7ff fe17 	bl	ec <SystemCoreClockUpdate>
+ 63a:	f7ff fd57 	bl	ec <SystemCoreClockUpdate>
 
     uint32_t reset_can_peripheral_time;
     const uint32_t can_error_delay = 5000;
     bool reset_can_peripheral = false;
 
 	if (SysTick_Config (SystemCoreClock / 1000)) {
- 4be:	21fa      	movs	r1, #250	; 0xfa
- 4c0:	4b46      	ldr	r3, [pc, #280]	; (5dc <main+0x130>)
- 4c2:	0089      	lsls	r1, r1, #2
- 4c4:	6818      	ldr	r0, [r3, #0]
- 4c6:	f000 f8f9 	bl	6bc <__udivsi3>
+ 63e:	21fa      	movs	r1, #250	; 0xfa
+ 640:	4b19      	ldr	r3, [pc, #100]	; (6a8 <main+0x70>)
+ 642:	0089      	lsls	r1, r1, #2
+ 644:	6818      	ldr	r0, [r3, #0]
+ 646:	f000 f88f 	bl	768 <__udivsi3>
     \param [in]  priority  Priority to set.
  */
 __STATIC_INLINE void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
 {
   if(IRQn < 0) {
     SCB->SHP[_SHP_IDX(IRQn)] = (SCB->SHP[_SHP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
- 4ca:	21c0      	movs	r1, #192	; 0xc0
+ 64a:	21c0      	movs	r1, #192	; 0xc0
  */
 __STATIC_INLINE uint32_t SysTick_Config(uint32_t ticks)
 {
   if (ticks > SysTick_LOAD_RELOAD_Msk)  return (1);            /* Reload value impossible */
 
   SysTick->LOAD  = (ticks & SysTick_LOAD_RELOAD_Msk) - 1;      /* set reload register */
- 4cc:	4a44      	ldr	r2, [pc, #272]	; (5e0 <main+0x134>)
- 4ce:	3801      	subs	r0, #1
- 4d0:	6050      	str	r0, [r2, #4]
+ 64c:	4a17      	ldr	r2, [pc, #92]	; (6ac <main+0x74>)
+ 64e:	3801      	subs	r0, #1
+ 650:	6050      	str	r0, [r2, #4]
     SCB->SHP[_SHP_IDX(IRQn)] = (SCB->SHP[_SHP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
- 4d2:	4844      	ldr	r0, [pc, #272]	; (5e4 <main+0x138>)
- 4d4:	0609      	lsls	r1, r1, #24
- 4d6:	6a03      	ldr	r3, [r0, #32]
+ 652:	4817      	ldr	r0, [pc, #92]	; (6b0 <main+0x78>)
+ 654:	0609      	lsls	r1, r1, #24
+ 656:	6a03      	ldr	r3, [r0, #32]
 	}
 
 	Chip_IOCON_PinMuxSet(LPC_IOCON, IOCON_PIO1_6, (IOCON_FUNC1 | IOCON_MODE_INACT)); /* RXD */
 	Chip_IOCON_PinMuxSet(LPC_IOCON, IOCON_PIO1_7, (IOCON_FUNC1 | IOCON_MODE_INACT)); /* TXD */
 
 	Chip_UART_Init(LPC_USART);
- 4d8:	4c43      	ldr	r4, [pc, #268]	; (5e8 <main+0x13c>)
- 4da:	021b      	lsls	r3, r3, #8
- 4dc:	0a1b      	lsrs	r3, r3, #8
- 4de:	430b      	orrs	r3, r1
- 4e0:	6203      	str	r3, [r0, #32]
+ 658:	4c16      	ldr	r4, [pc, #88]	; (6b4 <main+0x7c>)
+ 65a:	021b      	lsls	r3, r3, #8
+ 65c:	0a1b      	lsrs	r3, r3, #8
+ 65e:	430b      	orrs	r3, r1
+ 660:	6203      	str	r3, [r0, #32]
   NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority for Systick Interrupt */
   SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
- 4e2:	2300      	movs	r3, #0
- 4e4:	6093      	str	r3, [r2, #8]
+ 662:	2300      	movs	r3, #0
+ 664:	6093      	str	r3, [r2, #8]
   SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
- 4e6:	3307      	adds	r3, #7
- 4e8:	6013      	str	r3, [r2, #0]
+ 666:	3307      	adds	r3, #7
+ 668:	6013      	str	r3, [r2, #0]
  * @param	modefunc	: OR'ed values or type IOCON_*
  * @return	Nothing
  */
 STATIC INLINE void Chip_IOCON_PinMuxSet(LPC_IOCON_T *pIOCON, CHIP_IOCON_PIO_T pin, uint32_t modefunc)
 {
 	pIOCON->REG[pin] = modefunc;
- 4ea:	21a4      	movs	r1, #164	; 0xa4
- 4ec:	2201      	movs	r2, #1
- 4ee:	4b3f      	ldr	r3, [pc, #252]	; (5ec <main+0x140>)
- 4f0:	0020      	movs	r0, r4
- 4f2:	505a      	str	r2, [r3, r1]
- 4f4:	3104      	adds	r1, #4
- 4f6:	505a      	str	r2, [r3, r1]
- 4f8:	f7ff fe88 	bl	20c <Chip_UART_Init>
+ 66a:	21a4      	movs	r1, #164	; 0xa4
+ 66c:	2201      	movs	r2, #1
+ 66e:	4b12      	ldr	r3, [pc, #72]	; (6b8 <main+0x80>)
+ 670:	0020      	movs	r0, r4
+ 672:	505a      	str	r2, [r3, r1]
+ 674:	3104      	adds	r1, #4
+ 676:	505a      	str	r2, [r3, r1]
+ 678:	f7ff fdc8 	bl	20c <Chip_UART_Init>
 	Chip_UART_SetBaud(LPC_USART, 57600);
- 4fc:	21e1      	movs	r1, #225	; 0xe1
- 4fe:	0020      	movs	r0, r4
- 500:	0209      	lsls	r1, r1, #8
- 502:	f7ff fead 	bl	260 <Chip_UART_SetBaud>
+ 67c:	21e1      	movs	r1, #225	; 0xe1
+ 67e:	0020      	movs	r0, r4
+ 680:	0209      	lsls	r1, r1, #8
+ 682:	f7ff fded 	bl	260 <Chip_UART_SetBaud>
 	pUART->LCR = config;
- 506:	2303      	movs	r3, #3
- 508:	60e3      	str	r3, [r4, #12]
+ 686:	2303      	movs	r3, #3
+ 688:	60e3      	str	r3, [r4, #12]
 	pUART->FCR = fcr;
- 50a:	337e      	adds	r3, #126	; 0x7e
- 50c:	60a3      	str	r3, [r4, #8]
+ 68a:	337e      	adds	r3, #126	; 0x7e
+ 68c:	60a3      	str	r3, [r4, #8]
 	pUART->TER1 = UART_TER1_TXEN;
- 50e:	3b01      	subs	r3, #1
- 510:	6323      	str	r3, [r4, #48]	; 0x30
+ 68e:	3b01      	subs	r3, #1
+ 690:	6323      	str	r3, [r4, #48]	; 0x30
 	Chip_UART_ConfigData(LPC_USART, (UART_LCR_WLEN8 | UART_LCR_SBS_1BIT | UART_LCR_PARITY_DIS));
 	Chip_UART_SetupFIFOS(LPC_USART, (UART_FCR_FIFO_EN | UART_FCR_TRG_LEV2));
 	Chip_UART_TXEnable(LPC_USART);
 
 	DEBUG_Print("Started up\n\r");
- 512:	220c      	movs	r2, #12
- 514:	4936      	ldr	r1, [pc, #216]	; (5f0 <main+0x144>)
- 516:	0020      	movs	r0, r4
- 518:	f7ff fe8c 	bl	234 <Chip_UART_SendBlocking>
+ 692:	220c      	movs	r2, #12
+ 694:	4909      	ldr	r1, [pc, #36]	; (6bc <main+0x84>)
+ 696:	0020      	movs	r0, r4
+ 698:	f7ff fdcc 	bl	234 <Chip_UART_SendBlocking>
 
 	CAN_Init(500000);
- 51c:	4835      	ldr	r0, [pc, #212]	; (5f4 <main+0x148>)
- 51e:	f7ff ff45 	bl	3ac <CAN_Init>
- 522:	4b35      	ldr	r3, [pc, #212]	; (5f8 <main+0x14c>)
+ 69c:	4808      	ldr	r0, [pc, #32]	; (6c0 <main+0x88>)
+ 69e:	f7ff fe85 	bl	3ac <CAN_Init>
+            		CAN_Init(500000);
+            		DEBUG_Print("Reset CAN peripheral. \r\n ");
+            		reset_can_peripheral = false;
         	}
 
-		ret = CAN_Receive(&rx_msg);
-		
-		if (ret == NO_CAN_ERROR) {
-			switch (rx_msg.mode_id) {
- 524:	2598      	movs	r5, #152	; 0x98
- 526:	469b      	mov	fp, r3
- 528:	4b34      	ldr	r3, [pc, #208]	; (5fc <main+0x150>)
- 52a:	4c35      	ldr	r4, [pc, #212]	; (600 <main+0x154>)
- 52c:	469a      	mov	sl, r3
- 52e:	4b35      	ldr	r3, [pc, #212]	; (604 <main+0x158>)
- 530:	4e35      	ldr	r6, [pc, #212]	; (608 <main+0x15c>)
- 532:	4699      	mov	r9, r3
- 534:	4b35      	ldr	r3, [pc, #212]	; (60c <main+0x160>)
- 536:	af01      	add	r7, sp, #4
- 538:	4698      	mov	r8, r3
- 53a:	00ad      	lsls	r5, r5, #2
-		ret = CAN_Receive(&rx_msg);
- 53c:	0020      	movs	r0, r4
- 53e:	f7ff ff8f 	bl	460 <CAN_Receive>
-		if (ret == NO_CAN_ERROR) {
- 542:	2800      	cmp	r0, #0
- 544:	d1fa      	bne.n	53c <main+0x90>
-			switch (rx_msg.mode_id) {
- 546:	6823      	ldr	r3, [r4, #0]
- 548:	42ab      	cmp	r3, r5
- 54a:	d015      	beq.n	578 <main+0xcc>
- 54c:	d809      	bhi.n	562 <main+0xb6>
- 54e:	2b60      	cmp	r3, #96	; 0x60
- 550:	d024      	beq.n	59c <main+0xf0>
- 552:	2b61      	cmp	r3, #97	; 0x61
- 554:	d11c      	bne.n	590 <main+0xe4>
-						default:
-							break;
-					}
-					break;
-				case BMS_DISCHARGE_RESPONSE__id:
-					DEBUG_Print("BMS Discharge Response\r\n");
- 556:	2218      	movs	r2, #24
- 558:	4651      	mov	r1, sl
- 55a:	4823      	ldr	r0, [pc, #140]	; (5e8 <main+0x13c>)
- 55c:	f7ff fe6a 	bl	234 <Chip_UART_SendBlocking>
-					// TODO
-					break;
- 560:	e7ec      	b.n	53c <main+0x90>
-			switch (rx_msg.mode_id) {
- 562:	42b3      	cmp	r3, r6
- 564:	d00e      	beq.n	584 <main+0xd8>
- 566:	4a2a      	ldr	r2, [pc, #168]	; (610 <main+0x164>)
- 568:	4293      	cmp	r3, r2
- 56a:	d111      	bne.n	590 <main+0xe4>
-				case BMS_CELL_TEMPS__id:
-					DEBUG_Print("BMS Cell Temps");
-					//TODO
-					break;
-				case BMS_ERRORS__id:
-					DEBUG_Print("BMS Errors");
- 56c:	220a      	movs	r2, #10
- 56e:	4929      	ldr	r1, [pc, #164]	; (614 <main+0x168>)
- 570:	481d      	ldr	r0, [pc, #116]	; (5e8 <main+0x13c>)
- 572:	f7ff fe5f 	bl	234 <Chip_UART_SendBlocking>
-					//TODO
-					break;
- 576:	e7e1      	b.n	53c <main+0x90>
-					DEBUG_Print("BMS Pack Status");
- 578:	220f      	movs	r2, #15
- 57a:	4649      	mov	r1, r9
- 57c:	481a      	ldr	r0, [pc, #104]	; (5e8 <main+0x13c>)
- 57e:	f7ff fe59 	bl	234 <Chip_UART_SendBlocking>
-					break;
- 582:	e7db      	b.n	53c <main+0x90>
-					DEBUG_Print("BMS Cell Temps");
- 584:	220e      	movs	r2, #14
- 586:	4641      	mov	r1, r8
- 588:	4817      	ldr	r0, [pc, #92]	; (5e8 <main+0x13c>)
- 58a:	f7ff fe53 	bl	234 <Chip_UART_SendBlocking>
-					break;
- 58e:	e7d5      	b.n	53c <main+0x90>
-				default:
-					DEBUG_Print("Unrecognized CAN message");
- 590:	2218      	movs	r2, #24
- 592:	4921      	ldr	r1, [pc, #132]	; (618 <main+0x16c>)
- 594:	4814      	ldr	r0, [pc, #80]	; (5e8 <main+0x13c>)
- 596:	f7ff fe4d 	bl	234 <Chip_UART_SendBlocking>
- 59a:	e7cf      	b.n	53c <main+0x90>
-					DEBUG_Print("BMS Heartbeat\r\n");
- 59c:	220f      	movs	r2, #15
- 59e:	4659      	mov	r1, fp
- 5a0:	4811      	ldr	r0, [pc, #68]	; (5e8 <main+0x13c>)
- 5a2:	f7ff fe47 	bl	234 <Chip_UART_SendBlocking>
-					CAN_MakeBMSHeartbeat(&bms_heartbeat, &rx_msg);
- 5a6:	0021      	movs	r1, r4
- 5a8:	0038      	movs	r0, r7
- 5aa:	f000 f87f 	bl	6ac <CAN_MakeBMSHeartbeat>
-					switch (bms_heartbeat.state) {
- 5ae:	783b      	ldrb	r3, [r7, #0]
- 5b0:	2b00      	cmp	r3, #0
- 5b2:	d1c3      	bne.n	53c <main+0x90>
-							DEBUG_Print("BMS State: Init\r\n");
- 5b4:	2211      	movs	r2, #17
- 5b6:	4919      	ldr	r1, [pc, #100]	; (61c <main+0x170>)
- 5b8:	480b      	ldr	r0, [pc, #44]	; (5e8 <main+0x13c>)
- 5ba:	f7ff fe3b 	bl	234 <Chip_UART_SendBlocking>
-							itoa(bms_heartbeat.soc_percentage, soc_percentage_string, base_10);
- 5be:	a902      	add	r1, sp, #8
- 5c0:	220a      	movs	r2, #10
- 5c2:	8878      	ldrh	r0, [r7, #2]
- 5c4:	f000 f91e 	bl	804 <itoa>
-							DEBUG_Print(soc_percentage_string);
- 5c8:	a802      	add	r0, sp, #8
- 5ca:	f000 f961 	bl	890 <strlen>
- 5ce:	a902      	add	r1, sp, #8
- 5d0:	0002      	movs	r2, r0
- 5d2:	4805      	ldr	r0, [pc, #20]	; (5e8 <main+0x13c>)
- 5d4:	f7ff fe2e 	bl	234 <Chip_UART_SendBlocking>
-							break;
- 5d8:	e7b0      	b.n	53c <main+0x90>
- 5da:	46c0      	nop			; (mov r8, r8)
- 5dc:	10000100 	.word	0x10000100
- 5e0:	e000e010 	.word	0xe000e010
- 5e4:	e000ed00 	.word	0xe000ed00
- 5e8:	40008000 	.word	0x40008000
- 5ec:	40044000 	.word	0x40044000
- 5f0:	000009e4 	.word	0x000009e4
- 5f4:	0007a120 	.word	0x0007a120
- 5f8:	000009f4 	.word	0x000009f4
- 5fc:	00000a18 	.word	0x00000a18
- 600:	100002e8 	.word	0x100002e8
- 604:	00000a34 	.word	0x00000a34
- 608:	00000261 	.word	0x00000261
- 60c:	00000a44 	.word	0x00000a44
- 610:	00000262 	.word	0x00000262
- 614:	00000a54 	.word	0x00000a54
- 618:	00000a60 	.word	0x00000a60
- 61c:	00000a04 	.word	0x00000a04
+		Process_CAN_Inputs();
+ 6a2:	f7ff ff25 	bl	4f0 <Process_CAN_Inputs>
+ 6a6:	e7fc      	b.n	6a2 <main+0x6a>
+ 6a8:	10000100 	.word	0x10000100
+ 6ac:	e000e010 	.word	0xe000e010
+ 6b0:	e000ed00 	.word	0xe000ed00
+ 6b4:	40008000 	.word	0x40008000
+ 6b8:	40044000 	.word	0x40044000
+ 6bc:	00000bdc 	.word	0x00000bdc
+ 6c0:	0007a120 	.word	0x0007a120
 
-00000620 <SystemInit>:
+000006c4 <SystemInit>:
 #if (CLOCK_SETUP)                                 /* Clock Setup              */
 #if (SYSCLK_SETUP)                                /* System Clock Setup       */
 #if (SYSOSC_SETUP)                                /* System Oscillator Setup  */
   uint32_t i;
 
   LPC_SYSCTL->PDRUNCFG     &= ~(1 << 5);          /* Power-up System Osc      */
- 620:	218e      	movs	r1, #142	; 0x8e
- 622:	2020      	movs	r0, #32
- 624:	4b1f      	ldr	r3, [pc, #124]	; (6a4 <SystemInit+0x84>)
- 626:	0089      	lsls	r1, r1, #2
- 628:	585a      	ldr	r2, [r3, r1]
+ 6c4:	218e      	movs	r1, #142	; 0x8e
+ 6c6:	2020      	movs	r0, #32
+ 6c8:	4b1f      	ldr	r3, [pc, #124]	; (748 <SystemInit+0x84>)
+ 6ca:	0089      	lsls	r1, r1, #2
+ 6cc:	585a      	ldr	r2, [r3, r1]
 {
- 62a:	b510      	push	{r4, lr}
+ 6ce:	b510      	push	{r4, lr}
   LPC_SYSCTL->PDRUNCFG     &= ~(1 << 5);          /* Power-up System Osc      */
- 62c:	4382      	bics	r2, r0
- 62e:	505a      	str	r2, [r3, r1]
+ 6d0:	4382      	bics	r2, r0
+ 6d2:	505a      	str	r2, [r3, r1]
   LPC_SYSCTL->SYSOSCCTRL    = SYSOSCCTRL_Val;
- 630:	2200      	movs	r2, #0
- 632:	621a      	str	r2, [r3, #32]
- 634:	23c8      	movs	r3, #200	; 0xc8
+ 6d4:	2200      	movs	r2, #0
+ 6d6:	621a      	str	r2, [r3, #32]
+ 6d8:	23c8      	movs	r3, #200	; 0xc8
 
     No Operation does nothing. This instruction can be used for code alignment purposes.
  */
 __attribute__( ( always_inline ) ) __STATIC_INLINE void __NOP(void)
 {
   __ASM volatile ("nop");
- 636:	46c0      	nop			; (mov r8, r8)
- 638:	3b01      	subs	r3, #1
+ 6da:	46c0      	nop			; (mov r8, r8)
+ 6dc:	3b01      	subs	r3, #1
   for (i = 0; i < 200; i++) __NOP();
- 63a:	2b00      	cmp	r3, #0
- 63c:	d1fb      	bne.n	636 <SystemInit+0x16>
+ 6de:	2b00      	cmp	r3, #0
+ 6e0:	d1fb      	bne.n	6da <SystemInit+0x16>
   LPC_SYSCTL->SYSPLLCLKSEL  = SYSPLLCLKSEL_Val;   /* Select PLL Input         */
   LPC_SYSCTL->SYSPLLCLKUEN  = 0x1;               /* Update Clock Source      */
- 63e:	2101      	movs	r1, #1
+ 6e2:	2101      	movs	r1, #1
   LPC_SYSCTL->SYSPLLCLKSEL  = SYSPLLCLKSEL_Val;   /* Select PLL Input         */
- 640:	4a18      	ldr	r2, [pc, #96]	; (6a4 <SystemInit+0x84>)
- 642:	6413      	str	r3, [r2, #64]	; 0x40
+ 6e4:	4a18      	ldr	r2, [pc, #96]	; (748 <SystemInit+0x84>)
+ 6e6:	6413      	str	r3, [r2, #64]	; 0x40
   LPC_SYSCTL->SYSPLLCLKUEN  = 0x1;               /* Update Clock Source      */
- 644:	6451      	str	r1, [r2, #68]	; 0x44
+ 6e8:	6451      	str	r1, [r2, #68]	; 0x44
   LPC_SYSCTL->SYSPLLCLKUEN  = 0x0;               /* Toggle Update Register   */
- 646:	6453      	str	r3, [r2, #68]	; 0x44
+ 6ea:	6453      	str	r3, [r2, #68]	; 0x44
   LPC_SYSCTL->SYSPLLCLKUEN  = 0x1;
- 648:	6451      	str	r1, [r2, #68]	; 0x44
+ 6ec:	6451      	str	r1, [r2, #68]	; 0x44
   while (!(LPC_SYSCTL->SYSPLLCLKUEN & 0x1));     /* Wait Until Updated       */
- 64a:	6c53      	ldr	r3, [r2, #68]	; 0x44
- 64c:	4219      	tst	r1, r3
- 64e:	d0fc      	beq.n	64a <SystemInit+0x2a>
+ 6ee:	6c53      	ldr	r3, [r2, #68]	; 0x44
+ 6f0:	4219      	tst	r1, r3
+ 6f2:	d0fc      	beq.n	6ee <SystemInit+0x2a>
 #if (SYSPLL_SETUP)                                /* System PLL Setup         */
   LPC_SYSCTL->SYSPLLCTRL    = SYSPLLCTRL_Val;
- 650:	2361      	movs	r3, #97	; 0x61
+ 6f4:	2361      	movs	r3, #97	; 0x61
   LPC_SYSCTL->PDRUNCFG     &= ~(1 << 7);          /* Power-up SYSPLL          */
- 652:	218e      	movs	r1, #142	; 0x8e
- 654:	2080      	movs	r0, #128	; 0x80
+ 6f6:	218e      	movs	r1, #142	; 0x8e
+ 6f8:	2080      	movs	r0, #128	; 0x80
   LPC_SYSCTL->SYSPLLCTRL    = SYSPLLCTRL_Val;
- 656:	6093      	str	r3, [r2, #8]
+ 6fa:	6093      	str	r3, [r2, #8]
   LPC_SYSCTL->PDRUNCFG     &= ~(1 << 7);          /* Power-up SYSPLL          */
- 658:	0089      	lsls	r1, r1, #2
- 65a:	5853      	ldr	r3, [r2, r1]
- 65c:	4383      	bics	r3, r0
- 65e:	5053      	str	r3, [r2, r1]
+ 6fc:	0089      	lsls	r1, r1, #2
+ 6fe:	5853      	ldr	r3, [r2, r1]
+ 700:	4383      	bics	r3, r0
+ 702:	5053      	str	r3, [r2, r1]
   while (!(LPC_SYSCTL->SYSPLLSTAT & 0x1));        /* Wait Until PLL Locked    */
- 660:	2101      	movs	r1, #1
- 662:	4a10      	ldr	r2, [pc, #64]	; (6a4 <SystemInit+0x84>)
- 664:	68d3      	ldr	r3, [r2, #12]
- 666:	4219      	tst	r1, r3
- 668:	d0fc      	beq.n	664 <SystemInit+0x44>
+ 704:	2101      	movs	r1, #1
+ 706:	4a10      	ldr	r2, [pc, #64]	; (748 <SystemInit+0x84>)
+ 708:	68d3      	ldr	r3, [r2, #12]
+ 70a:	4219      	tst	r1, r3
+ 70c:	d0fc      	beq.n	708 <SystemInit+0x44>
   LPC_SYSCTL->WDTOSCCTRL    = WDTOSCCTRL_Val;
   LPC_SYSCTL->PDRUNCFG     &= ~(1 << 6);          /* Power-up WDT Clock       */
 #endif
   LPC_SYSCTL->MAINCLKSEL    = MAINCLKSEL_Val;     /* Select PLL Clock Output  */
   LPC_SYSCTL->MAINCLKUEN    = 0x1;               /* Update MCLK Clock Source */
   LPC_SYSCTL->MAINCLKUEN    = 0x0;               /* Toggle Update Register   */
- 66a:	2300      	movs	r3, #0
+ 70e:	2300      	movs	r3, #0
   LPC_SYSCTL->MAINCLKSEL    = MAINCLKSEL_Val;     /* Select PLL Clock Output  */
- 66c:	6711      	str	r1, [r2, #112]	; 0x70
+ 710:	6711      	str	r1, [r2, #112]	; 0x70
   LPC_SYSCTL->MAINCLKUEN    = 0x1;               /* Update MCLK Clock Source */
- 66e:	6751      	str	r1, [r2, #116]	; 0x74
+ 712:	6751      	str	r1, [r2, #116]	; 0x74
   LPC_SYSCTL->MAINCLKUEN    = 0x0;               /* Toggle Update Register   */
- 670:	6753      	str	r3, [r2, #116]	; 0x74
+ 714:	6753      	str	r3, [r2, #116]	; 0x74
   LPC_SYSCTL->MAINCLKUEN    = 0x1;
- 672:	6751      	str	r1, [r2, #116]	; 0x74
+ 716:	6751      	str	r1, [r2, #116]	; 0x74
   while (!(LPC_SYSCTL->MAINCLKUEN & 0x1));       /* Wait Until Updated       */
- 674:	2101      	movs	r1, #1
- 676:	4a0b      	ldr	r2, [pc, #44]	; (6a4 <SystemInit+0x84>)
- 678:	6f53      	ldr	r3, [r2, #116]	; 0x74
- 67a:	4219      	tst	r1, r3
- 67c:	d0fc      	beq.n	678 <SystemInit+0x58>
+ 718:	2101      	movs	r1, #1
+ 71a:	4a0b      	ldr	r2, [pc, #44]	; (748 <SystemInit+0x84>)
+ 71c:	6f53      	ldr	r3, [r2, #116]	; 0x74
+ 71e:	4219      	tst	r1, r3
+ 720:	d0fc      	beq.n	71c <SystemInit+0x58>
 #endif
   LPC_SYSCTL->PDRUNCFG     |=  (1 << 10);         /* Power-down USB PHY       */
- 67e:	238e      	movs	r3, #142	; 0x8e
- 680:	2080      	movs	r0, #128	; 0x80
- 682:	009b      	lsls	r3, r3, #2
- 684:	58d4      	ldr	r4, [r2, r3]
- 686:	00c0      	lsls	r0, r0, #3
- 688:	4320      	orrs	r0, r4
- 68a:	50d0      	str	r0, [r2, r3]
+ 722:	238e      	movs	r3, #142	; 0x8e
+ 724:	2080      	movs	r0, #128	; 0x80
+ 726:	009b      	lsls	r3, r3, #2
+ 728:	58d4      	ldr	r4, [r2, r3]
+ 72a:	00c0      	lsls	r0, r0, #3
+ 72c:	4320      	orrs	r0, r4
+ 72e:	50d0      	str	r0, [r2, r3]
   LPC_SYSCTL->PDRUNCFG     |=  (1 <<  8);         /* Power-down USB PLL       */
- 68c:	2080      	movs	r0, #128	; 0x80
- 68e:	58d4      	ldr	r4, [r2, r3]
- 690:	0040      	lsls	r0, r0, #1
- 692:	4320      	orrs	r0, r4
- 694:	50d0      	str	r0, [r2, r3]
+ 730:	2080      	movs	r0, #128	; 0x80
+ 732:	58d4      	ldr	r4, [r2, r3]
+ 734:	0040      	lsls	r0, r0, #1
+ 736:	4320      	orrs	r0, r4
+ 738:	50d0      	str	r0, [r2, r3]
 
   LPC_SYSCTL->SYSAHBCLKDIV  = SYSAHBCLKDIV_Val;
- 696:	6791      	str	r1, [r2, #120]	; 0x78
+ 73a:	6791      	str	r1, [r2, #120]	; 0x78
   LPC_SYSCTL->SYSAHBCLKCTRL = AHBCLKCTRL_Val;
- 698:	3bb9      	subs	r3, #185	; 0xb9
- 69a:	4903      	ldr	r1, [pc, #12]	; (6a8 <SystemInit+0x88>)
- 69c:	3bff      	subs	r3, #255	; 0xff
- 69e:	50d1      	str	r1, [r2, r3]
+ 73c:	3bb9      	subs	r3, #185	; 0xb9
+ 73e:	4903      	ldr	r1, [pc, #12]	; (74c <SystemInit+0x88>)
+ 740:	3bff      	subs	r3, #255	; 0xff
+ 742:	50d1      	str	r1, [r2, r3]
 #endif
 
 #if (MEMMAP_SETUP || MEMMAP_INIT)       /* Memory Mapping Setup               */
   LPC_SYSCTL->SYSMEMREMAP = SYSMEMREMAP_Val;
 #endif
 }
- 6a0:	bd10      	pop	{r4, pc}
- 6a2:	46c0      	nop			; (mov r8, r8)
- 6a4:	40048000 	.word	0x40048000
- 6a8:	0001005f 	.word	0x0001005f
+ 744:	bd10      	pop	{r4, pc}
+ 746:	46c0      	nop			; (mov r8, r8)
+ 748:	40048000 	.word	0x40048000
+ 74c:	0001005f 	.word	0x0001005f
 
-000006ac <CAN_MakeBMSHeartbeat>:
+00000750 <CAN_MakeBMSHeartbeat>:
 	//get soc_percentage
 	//construct BMS_HEARTBEAT_T
 	const uint32_t CAN_message_highest_bit = 63;
 	const uint64_t soc_percentage_mask = 0x1FFC000000000000;
 	uint64_t state = 
 		msg_obj->data_64 >> (CAN_message_highest_bit - __BMS_HEARTBEAT__STATE__end);
- 6ac:	68cb      	ldr	r3, [r1, #12]
+ 750:	68cb      	ldr	r3, [r1, #12]
 	uint64_t state = 
- 6ae:	0f5a      	lsrs	r2, r3, #29
+ 752:	0f5a      	lsrs	r2, r3, #29
 	uint64_t soc_percentage = (msg_obj->data_64 & soc_percentage_mask) >> 
- 6b0:	00db      	lsls	r3, r3, #3
- 6b2:	0d9b      	lsrs	r3, r3, #22
+ 754:	00db      	lsls	r3, r3, #3
+ 756:	0d9b      	lsrs	r3, r3, #22
 		(CAN_message_highest_bit - __BMS_HEARTBEAT__SOC_PERCENTAGE__end);
 
 	bms_heartbeat->state = state;
- 6b4:	7002      	strb	r2, [r0, #0]
+ 758:	7002      	strb	r2, [r0, #0]
 	bms_heartbeat->soc_percentage = soc_percentage;
- 6b6:	8043      	strh	r3, [r0, #2]
+ 75a:	8043      	strh	r3, [r0, #2]
 }
- 6b8:	4770      	bx	lr
- 6ba:	46c0      	nop			; (mov r8, r8)
+ 75c:	4770      	bx	lr
+ 75e:	46c0      	nop			; (mov r8, r8)
 
-000006bc <__udivsi3>:
- 6bc:	2200      	movs	r2, #0
- 6be:	0843      	lsrs	r3, r0, #1
- 6c0:	428b      	cmp	r3, r1
- 6c2:	d374      	bcc.n	7ae <__udivsi3+0xf2>
- 6c4:	0903      	lsrs	r3, r0, #4
- 6c6:	428b      	cmp	r3, r1
- 6c8:	d35f      	bcc.n	78a <__udivsi3+0xce>
- 6ca:	0a03      	lsrs	r3, r0, #8
- 6cc:	428b      	cmp	r3, r1
- 6ce:	d344      	bcc.n	75a <__udivsi3+0x9e>
- 6d0:	0b03      	lsrs	r3, r0, #12
- 6d2:	428b      	cmp	r3, r1
- 6d4:	d328      	bcc.n	728 <__udivsi3+0x6c>
- 6d6:	0c03      	lsrs	r3, r0, #16
- 6d8:	428b      	cmp	r3, r1
- 6da:	d30d      	bcc.n	6f8 <__udivsi3+0x3c>
- 6dc:	22ff      	movs	r2, #255	; 0xff
- 6de:	0209      	lsls	r1, r1, #8
- 6e0:	ba12      	rev	r2, r2
- 6e2:	0c03      	lsrs	r3, r0, #16
- 6e4:	428b      	cmp	r3, r1
- 6e6:	d302      	bcc.n	6ee <__udivsi3+0x32>
- 6e8:	1212      	asrs	r2, r2, #8
- 6ea:	0209      	lsls	r1, r1, #8
- 6ec:	d065      	beq.n	7ba <__udivsi3+0xfe>
- 6ee:	0b03      	lsrs	r3, r0, #12
- 6f0:	428b      	cmp	r3, r1
- 6f2:	d319      	bcc.n	728 <__udivsi3+0x6c>
- 6f4:	e000      	b.n	6f8 <__udivsi3+0x3c>
- 6f6:	0a09      	lsrs	r1, r1, #8
- 6f8:	0bc3      	lsrs	r3, r0, #15
- 6fa:	428b      	cmp	r3, r1
- 6fc:	d301      	bcc.n	702 <__udivsi3+0x46>
- 6fe:	03cb      	lsls	r3, r1, #15
- 700:	1ac0      	subs	r0, r0, r3
- 702:	4152      	adcs	r2, r2
- 704:	0b83      	lsrs	r3, r0, #14
- 706:	428b      	cmp	r3, r1
- 708:	d301      	bcc.n	70e <__udivsi3+0x52>
- 70a:	038b      	lsls	r3, r1, #14
- 70c:	1ac0      	subs	r0, r0, r3
- 70e:	4152      	adcs	r2, r2
- 710:	0b43      	lsrs	r3, r0, #13
- 712:	428b      	cmp	r3, r1
- 714:	d301      	bcc.n	71a <__udivsi3+0x5e>
- 716:	034b      	lsls	r3, r1, #13
- 718:	1ac0      	subs	r0, r0, r3
- 71a:	4152      	adcs	r2, r2
- 71c:	0b03      	lsrs	r3, r0, #12
- 71e:	428b      	cmp	r3, r1
- 720:	d301      	bcc.n	726 <__udivsi3+0x6a>
- 722:	030b      	lsls	r3, r1, #12
- 724:	1ac0      	subs	r0, r0, r3
- 726:	4152      	adcs	r2, r2
- 728:	0ac3      	lsrs	r3, r0, #11
- 72a:	428b      	cmp	r3, r1
- 72c:	d301      	bcc.n	732 <__udivsi3+0x76>
- 72e:	02cb      	lsls	r3, r1, #11
- 730:	1ac0      	subs	r0, r0, r3
- 732:	4152      	adcs	r2, r2
- 734:	0a83      	lsrs	r3, r0, #10
- 736:	428b      	cmp	r3, r1
- 738:	d301      	bcc.n	73e <__udivsi3+0x82>
- 73a:	028b      	lsls	r3, r1, #10
- 73c:	1ac0      	subs	r0, r0, r3
- 73e:	4152      	adcs	r2, r2
- 740:	0a43      	lsrs	r3, r0, #9
- 742:	428b      	cmp	r3, r1
- 744:	d301      	bcc.n	74a <__udivsi3+0x8e>
- 746:	024b      	lsls	r3, r1, #9
- 748:	1ac0      	subs	r0, r0, r3
- 74a:	4152      	adcs	r2, r2
- 74c:	0a03      	lsrs	r3, r0, #8
- 74e:	428b      	cmp	r3, r1
- 750:	d301      	bcc.n	756 <__udivsi3+0x9a>
- 752:	020b      	lsls	r3, r1, #8
- 754:	1ac0      	subs	r0, r0, r3
- 756:	4152      	adcs	r2, r2
- 758:	d2cd      	bcs.n	6f6 <__udivsi3+0x3a>
- 75a:	09c3      	lsrs	r3, r0, #7
- 75c:	428b      	cmp	r3, r1
- 75e:	d301      	bcc.n	764 <__udivsi3+0xa8>
- 760:	01cb      	lsls	r3, r1, #7
- 762:	1ac0      	subs	r0, r0, r3
- 764:	4152      	adcs	r2, r2
- 766:	0983      	lsrs	r3, r0, #6
- 768:	428b      	cmp	r3, r1
- 76a:	d301      	bcc.n	770 <__udivsi3+0xb4>
- 76c:	018b      	lsls	r3, r1, #6
- 76e:	1ac0      	subs	r0, r0, r3
- 770:	4152      	adcs	r2, r2
- 772:	0943      	lsrs	r3, r0, #5
- 774:	428b      	cmp	r3, r1
- 776:	d301      	bcc.n	77c <__udivsi3+0xc0>
- 778:	014b      	lsls	r3, r1, #5
- 77a:	1ac0      	subs	r0, r0, r3
- 77c:	4152      	adcs	r2, r2
- 77e:	0903      	lsrs	r3, r0, #4
- 780:	428b      	cmp	r3, r1
- 782:	d301      	bcc.n	788 <__udivsi3+0xcc>
- 784:	010b      	lsls	r3, r1, #4
- 786:	1ac0      	subs	r0, r0, r3
- 788:	4152      	adcs	r2, r2
- 78a:	08c3      	lsrs	r3, r0, #3
- 78c:	428b      	cmp	r3, r1
- 78e:	d301      	bcc.n	794 <__udivsi3+0xd8>
- 790:	00cb      	lsls	r3, r1, #3
- 792:	1ac0      	subs	r0, r0, r3
- 794:	4152      	adcs	r2, r2
- 796:	0883      	lsrs	r3, r0, #2
- 798:	428b      	cmp	r3, r1
- 79a:	d301      	bcc.n	7a0 <__udivsi3+0xe4>
- 79c:	008b      	lsls	r3, r1, #2
- 79e:	1ac0      	subs	r0, r0, r3
- 7a0:	4152      	adcs	r2, r2
- 7a2:	0843      	lsrs	r3, r0, #1
- 7a4:	428b      	cmp	r3, r1
- 7a6:	d301      	bcc.n	7ac <__udivsi3+0xf0>
- 7a8:	004b      	lsls	r3, r1, #1
- 7aa:	1ac0      	subs	r0, r0, r3
- 7ac:	4152      	adcs	r2, r2
- 7ae:	1a41      	subs	r1, r0, r1
- 7b0:	d200      	bcs.n	7b4 <__udivsi3+0xf8>
- 7b2:	4601      	mov	r1, r0
- 7b4:	4152      	adcs	r2, r2
- 7b6:	4610      	mov	r0, r2
- 7b8:	4770      	bx	lr
- 7ba:	e7ff      	b.n	7bc <__udivsi3+0x100>
- 7bc:	b501      	push	{r0, lr}
- 7be:	2000      	movs	r0, #0
- 7c0:	f000 f806 	bl	7d0 <__aeabi_idiv0>
- 7c4:	bd02      	pop	{r1, pc}
- 7c6:	46c0      	nop			; (mov r8, r8)
+00000760 <CAN_MakeBMSDischargeResponse>:
 
-000007c8 <__aeabi_uidivmod>:
- 7c8:	2900      	cmp	r1, #0
- 7ca:	d0f7      	beq.n	7bc <__udivsi3+0x100>
- 7cc:	e776      	b.n	6bc <__udivsi3>
- 7ce:	4770      	bx	lr
+void CAN_MakeBMSDischargeResponse(BMS_DISCHARGE_RESPONSE_T * bms_discharge_response, CCAN_MSG_OBJ_T * msg_obj) {
+        const uint32_t CAN_message_highest_bit = 63;
+        const uint64_t bms_discharge_response_mask = 0x8000000000000000;
+        uint64_t discharge_response = (msg_obj->data_64 & bms_discharge_response_mask) >> 
+ 760:	68cb      	ldr	r3, [r1, #12]
+ 762:	0fdb      	lsrs	r3, r3, #31
+		(CAN_message_highest_bit - __BMS_DISCHARGE_RESPONSE__DISCHARGE_RESPONSE__end);
 
-000007d0 <__aeabi_idiv0>:
- 7d0:	4770      	bx	lr
- 7d2:	46c0      	nop			; (mov r8, r8)
+        bms_discharge_response->discharge_response = discharge_response;
+ 764:	7003      	strb	r3, [r0, #0]
+}
+ 766:	4770      	bx	lr
 
-000007d4 <__itoa>:
- 7d4:	1e93      	subs	r3, r2, #2
- 7d6:	b510      	push	{r4, lr}
- 7d8:	000c      	movs	r4, r1
- 7da:	2b22      	cmp	r3, #34	; 0x22
- 7dc:	d80e      	bhi.n	7fc <__itoa+0x28>
- 7de:	2a0a      	cmp	r2, #10
- 7e0:	d005      	beq.n	7ee <__itoa+0x1a>
- 7e2:	2100      	movs	r1, #0
- 7e4:	1861      	adds	r1, r4, r1
- 7e6:	f000 f885 	bl	8f4 <__utoa>
- 7ea:	0020      	movs	r0, r4
- 7ec:	bd10      	pop	{r4, pc}
- 7ee:	2800      	cmp	r0, #0
- 7f0:	daf7      	bge.n	7e2 <__itoa+0xe>
- 7f2:	232d      	movs	r3, #45	; 0x2d
- 7f4:	4240      	negs	r0, r0
- 7f6:	700b      	strb	r3, [r1, #0]
- 7f8:	2101      	movs	r1, #1
- 7fa:	e7f3      	b.n	7e4 <__itoa+0x10>
- 7fc:	2300      	movs	r3, #0
- 7fe:	2000      	movs	r0, #0
- 800:	700b      	strb	r3, [r1, #0]
- 802:	e7f3      	b.n	7ec <__itoa+0x18>
+00000768 <__udivsi3>:
+ 768:	2200      	movs	r2, #0
+ 76a:	0843      	lsrs	r3, r0, #1
+ 76c:	428b      	cmp	r3, r1
+ 76e:	d374      	bcc.n	85a <__udivsi3+0xf2>
+ 770:	0903      	lsrs	r3, r0, #4
+ 772:	428b      	cmp	r3, r1
+ 774:	d35f      	bcc.n	836 <__udivsi3+0xce>
+ 776:	0a03      	lsrs	r3, r0, #8
+ 778:	428b      	cmp	r3, r1
+ 77a:	d344      	bcc.n	806 <__udivsi3+0x9e>
+ 77c:	0b03      	lsrs	r3, r0, #12
+ 77e:	428b      	cmp	r3, r1
+ 780:	d328      	bcc.n	7d4 <__udivsi3+0x6c>
+ 782:	0c03      	lsrs	r3, r0, #16
+ 784:	428b      	cmp	r3, r1
+ 786:	d30d      	bcc.n	7a4 <__udivsi3+0x3c>
+ 788:	22ff      	movs	r2, #255	; 0xff
+ 78a:	0209      	lsls	r1, r1, #8
+ 78c:	ba12      	rev	r2, r2
+ 78e:	0c03      	lsrs	r3, r0, #16
+ 790:	428b      	cmp	r3, r1
+ 792:	d302      	bcc.n	79a <__udivsi3+0x32>
+ 794:	1212      	asrs	r2, r2, #8
+ 796:	0209      	lsls	r1, r1, #8
+ 798:	d065      	beq.n	866 <__udivsi3+0xfe>
+ 79a:	0b03      	lsrs	r3, r0, #12
+ 79c:	428b      	cmp	r3, r1
+ 79e:	d319      	bcc.n	7d4 <__udivsi3+0x6c>
+ 7a0:	e000      	b.n	7a4 <__udivsi3+0x3c>
+ 7a2:	0a09      	lsrs	r1, r1, #8
+ 7a4:	0bc3      	lsrs	r3, r0, #15
+ 7a6:	428b      	cmp	r3, r1
+ 7a8:	d301      	bcc.n	7ae <__udivsi3+0x46>
+ 7aa:	03cb      	lsls	r3, r1, #15
+ 7ac:	1ac0      	subs	r0, r0, r3
+ 7ae:	4152      	adcs	r2, r2
+ 7b0:	0b83      	lsrs	r3, r0, #14
+ 7b2:	428b      	cmp	r3, r1
+ 7b4:	d301      	bcc.n	7ba <__udivsi3+0x52>
+ 7b6:	038b      	lsls	r3, r1, #14
+ 7b8:	1ac0      	subs	r0, r0, r3
+ 7ba:	4152      	adcs	r2, r2
+ 7bc:	0b43      	lsrs	r3, r0, #13
+ 7be:	428b      	cmp	r3, r1
+ 7c0:	d301      	bcc.n	7c6 <__udivsi3+0x5e>
+ 7c2:	034b      	lsls	r3, r1, #13
+ 7c4:	1ac0      	subs	r0, r0, r3
+ 7c6:	4152      	adcs	r2, r2
+ 7c8:	0b03      	lsrs	r3, r0, #12
+ 7ca:	428b      	cmp	r3, r1
+ 7cc:	d301      	bcc.n	7d2 <__udivsi3+0x6a>
+ 7ce:	030b      	lsls	r3, r1, #12
+ 7d0:	1ac0      	subs	r0, r0, r3
+ 7d2:	4152      	adcs	r2, r2
+ 7d4:	0ac3      	lsrs	r3, r0, #11
+ 7d6:	428b      	cmp	r3, r1
+ 7d8:	d301      	bcc.n	7de <__udivsi3+0x76>
+ 7da:	02cb      	lsls	r3, r1, #11
+ 7dc:	1ac0      	subs	r0, r0, r3
+ 7de:	4152      	adcs	r2, r2
+ 7e0:	0a83      	lsrs	r3, r0, #10
+ 7e2:	428b      	cmp	r3, r1
+ 7e4:	d301      	bcc.n	7ea <__udivsi3+0x82>
+ 7e6:	028b      	lsls	r3, r1, #10
+ 7e8:	1ac0      	subs	r0, r0, r3
+ 7ea:	4152      	adcs	r2, r2
+ 7ec:	0a43      	lsrs	r3, r0, #9
+ 7ee:	428b      	cmp	r3, r1
+ 7f0:	d301      	bcc.n	7f6 <__udivsi3+0x8e>
+ 7f2:	024b      	lsls	r3, r1, #9
+ 7f4:	1ac0      	subs	r0, r0, r3
+ 7f6:	4152      	adcs	r2, r2
+ 7f8:	0a03      	lsrs	r3, r0, #8
+ 7fa:	428b      	cmp	r3, r1
+ 7fc:	d301      	bcc.n	802 <__udivsi3+0x9a>
+ 7fe:	020b      	lsls	r3, r1, #8
+ 800:	1ac0      	subs	r0, r0, r3
+ 802:	4152      	adcs	r2, r2
+ 804:	d2cd      	bcs.n	7a2 <__udivsi3+0x3a>
+ 806:	09c3      	lsrs	r3, r0, #7
+ 808:	428b      	cmp	r3, r1
+ 80a:	d301      	bcc.n	810 <__udivsi3+0xa8>
+ 80c:	01cb      	lsls	r3, r1, #7
+ 80e:	1ac0      	subs	r0, r0, r3
+ 810:	4152      	adcs	r2, r2
+ 812:	0983      	lsrs	r3, r0, #6
+ 814:	428b      	cmp	r3, r1
+ 816:	d301      	bcc.n	81c <__udivsi3+0xb4>
+ 818:	018b      	lsls	r3, r1, #6
+ 81a:	1ac0      	subs	r0, r0, r3
+ 81c:	4152      	adcs	r2, r2
+ 81e:	0943      	lsrs	r3, r0, #5
+ 820:	428b      	cmp	r3, r1
+ 822:	d301      	bcc.n	828 <__udivsi3+0xc0>
+ 824:	014b      	lsls	r3, r1, #5
+ 826:	1ac0      	subs	r0, r0, r3
+ 828:	4152      	adcs	r2, r2
+ 82a:	0903      	lsrs	r3, r0, #4
+ 82c:	428b      	cmp	r3, r1
+ 82e:	d301      	bcc.n	834 <__udivsi3+0xcc>
+ 830:	010b      	lsls	r3, r1, #4
+ 832:	1ac0      	subs	r0, r0, r3
+ 834:	4152      	adcs	r2, r2
+ 836:	08c3      	lsrs	r3, r0, #3
+ 838:	428b      	cmp	r3, r1
+ 83a:	d301      	bcc.n	840 <__udivsi3+0xd8>
+ 83c:	00cb      	lsls	r3, r1, #3
+ 83e:	1ac0      	subs	r0, r0, r3
+ 840:	4152      	adcs	r2, r2
+ 842:	0883      	lsrs	r3, r0, #2
+ 844:	428b      	cmp	r3, r1
+ 846:	d301      	bcc.n	84c <__udivsi3+0xe4>
+ 848:	008b      	lsls	r3, r1, #2
+ 84a:	1ac0      	subs	r0, r0, r3
+ 84c:	4152      	adcs	r2, r2
+ 84e:	0843      	lsrs	r3, r0, #1
+ 850:	428b      	cmp	r3, r1
+ 852:	d301      	bcc.n	858 <__udivsi3+0xf0>
+ 854:	004b      	lsls	r3, r1, #1
+ 856:	1ac0      	subs	r0, r0, r3
+ 858:	4152      	adcs	r2, r2
+ 85a:	1a41      	subs	r1, r0, r1
+ 85c:	d200      	bcs.n	860 <__udivsi3+0xf8>
+ 85e:	4601      	mov	r1, r0
+ 860:	4152      	adcs	r2, r2
+ 862:	4610      	mov	r0, r2
+ 864:	4770      	bx	lr
+ 866:	e7ff      	b.n	868 <__udivsi3+0x100>
+ 868:	b501      	push	{r0, lr}
+ 86a:	2000      	movs	r0, #0
+ 86c:	f000 f806 	bl	87c <__aeabi_idiv0>
+ 870:	bd02      	pop	{r1, pc}
+ 872:	46c0      	nop			; (mov r8, r8)
 
-00000804 <itoa>:
- 804:	b510      	push	{r4, lr}
- 806:	f7ff ffe5 	bl	7d4 <__itoa>
- 80a:	bd10      	pop	{r4, pc}
+00000874 <__aeabi_uidivmod>:
+ 874:	2900      	cmp	r1, #0
+ 876:	d0f7      	beq.n	868 <__udivsi3+0x100>
+ 878:	e776      	b.n	768 <__udivsi3>
+ 87a:	4770      	bx	lr
 
-0000080c <memcpy>:
- 80c:	b5f0      	push	{r4, r5, r6, r7, lr}
- 80e:	0005      	movs	r5, r0
- 810:	2a0f      	cmp	r2, #15
- 812:	d92f      	bls.n	874 <memcpy+0x68>
- 814:	000b      	movs	r3, r1
- 816:	4303      	orrs	r3, r0
- 818:	079b      	lsls	r3, r3, #30
- 81a:	d134      	bne.n	886 <memcpy+0x7a>
- 81c:	0016      	movs	r6, r2
- 81e:	000c      	movs	r4, r1
- 820:	0003      	movs	r3, r0
- 822:	3e10      	subs	r6, #16
- 824:	0935      	lsrs	r5, r6, #4
- 826:	3501      	adds	r5, #1
- 828:	012d      	lsls	r5, r5, #4
- 82a:	1945      	adds	r5, r0, r5
- 82c:	6827      	ldr	r7, [r4, #0]
- 82e:	601f      	str	r7, [r3, #0]
- 830:	6867      	ldr	r7, [r4, #4]
- 832:	605f      	str	r7, [r3, #4]
- 834:	68a7      	ldr	r7, [r4, #8]
- 836:	609f      	str	r7, [r3, #8]
- 838:	68e7      	ldr	r7, [r4, #12]
- 83a:	3410      	adds	r4, #16
- 83c:	60df      	str	r7, [r3, #12]
- 83e:	3310      	adds	r3, #16
- 840:	429d      	cmp	r5, r3
- 842:	d1f3      	bne.n	82c <memcpy+0x20>
- 844:	230f      	movs	r3, #15
- 846:	439e      	bics	r6, r3
- 848:	3610      	adds	r6, #16
- 84a:	1985      	adds	r5, r0, r6
- 84c:	1989      	adds	r1, r1, r6
- 84e:	4013      	ands	r3, r2
- 850:	2b03      	cmp	r3, #3
- 852:	d91a      	bls.n	88a <memcpy+0x7e>
- 854:	1f1e      	subs	r6, r3, #4
- 856:	2300      	movs	r3, #0
- 858:	08b4      	lsrs	r4, r6, #2
- 85a:	3401      	adds	r4, #1
- 85c:	00a4      	lsls	r4, r4, #2
- 85e:	58cf      	ldr	r7, [r1, r3]
- 860:	50ef      	str	r7, [r5, r3]
- 862:	3304      	adds	r3, #4
- 864:	42a3      	cmp	r3, r4
- 866:	d1fa      	bne.n	85e <memcpy+0x52>
- 868:	2403      	movs	r4, #3
- 86a:	43a6      	bics	r6, r4
- 86c:	1d33      	adds	r3, r6, #4
- 86e:	4022      	ands	r2, r4
- 870:	18c9      	adds	r1, r1, r3
- 872:	18ed      	adds	r5, r5, r3
- 874:	2a00      	cmp	r2, #0
- 876:	d005      	beq.n	884 <memcpy+0x78>
- 878:	2300      	movs	r3, #0
- 87a:	5ccc      	ldrb	r4, [r1, r3]
- 87c:	54ec      	strb	r4, [r5, r3]
- 87e:	3301      	adds	r3, #1
- 880:	4293      	cmp	r3, r2
- 882:	d1fa      	bne.n	87a <memcpy+0x6e>
- 884:	bdf0      	pop	{r4, r5, r6, r7, pc}
- 886:	0005      	movs	r5, r0
- 888:	e7f6      	b.n	878 <memcpy+0x6c>
- 88a:	001a      	movs	r2, r3
- 88c:	e7f2      	b.n	874 <memcpy+0x68>
- 88e:	46c0      	nop			; (mov r8, r8)
+0000087c <__aeabi_idiv0>:
+ 87c:	4770      	bx	lr
+ 87e:	46c0      	nop			; (mov r8, r8)
 
-00000890 <strlen>:
- 890:	b510      	push	{r4, lr}
- 892:	0783      	lsls	r3, r0, #30
- 894:	d025      	beq.n	8e2 <strlen+0x52>
- 896:	7803      	ldrb	r3, [r0, #0]
- 898:	2b00      	cmp	r3, #0
- 89a:	d024      	beq.n	8e6 <strlen+0x56>
- 89c:	0003      	movs	r3, r0
- 89e:	2103      	movs	r1, #3
- 8a0:	e002      	b.n	8a8 <strlen+0x18>
- 8a2:	781a      	ldrb	r2, [r3, #0]
- 8a4:	2a00      	cmp	r2, #0
- 8a6:	d01a      	beq.n	8de <strlen+0x4e>
- 8a8:	3301      	adds	r3, #1
- 8aa:	420b      	tst	r3, r1
- 8ac:	d1f9      	bne.n	8a2 <strlen+0x12>
- 8ae:	6819      	ldr	r1, [r3, #0]
- 8b0:	4a0e      	ldr	r2, [pc, #56]	; (8ec <strlen+0x5c>)
- 8b2:	4c0f      	ldr	r4, [pc, #60]	; (8f0 <strlen+0x60>)
- 8b4:	188a      	adds	r2, r1, r2
- 8b6:	438a      	bics	r2, r1
- 8b8:	4222      	tst	r2, r4
- 8ba:	d106      	bne.n	8ca <strlen+0x3a>
- 8bc:	3304      	adds	r3, #4
- 8be:	6819      	ldr	r1, [r3, #0]
- 8c0:	4a0a      	ldr	r2, [pc, #40]	; (8ec <strlen+0x5c>)
- 8c2:	188a      	adds	r2, r1, r2
- 8c4:	438a      	bics	r2, r1
- 8c6:	4222      	tst	r2, r4
- 8c8:	d0f8      	beq.n	8bc <strlen+0x2c>
- 8ca:	001a      	movs	r2, r3
- 8cc:	781b      	ldrb	r3, [r3, #0]
- 8ce:	2b00      	cmp	r3, #0
- 8d0:	d003      	beq.n	8da <strlen+0x4a>
- 8d2:	3201      	adds	r2, #1
- 8d4:	7811      	ldrb	r1, [r2, #0]
- 8d6:	2900      	cmp	r1, #0
- 8d8:	d1fb      	bne.n	8d2 <strlen+0x42>
- 8da:	1a10      	subs	r0, r2, r0
- 8dc:	bd10      	pop	{r4, pc}
- 8de:	1a18      	subs	r0, r3, r0
- 8e0:	e7fc      	b.n	8dc <strlen+0x4c>
- 8e2:	0003      	movs	r3, r0
- 8e4:	e7e3      	b.n	8ae <strlen+0x1e>
- 8e6:	2000      	movs	r0, #0
- 8e8:	e7f8      	b.n	8dc <strlen+0x4c>
- 8ea:	46c0      	nop			; (mov r8, r8)
- 8ec:	fefefeff 	.word	0xfefefeff
- 8f0:	80808080 	.word	0x80808080
+00000880 <__itoa>:
+ 880:	1e93      	subs	r3, r2, #2
+ 882:	b510      	push	{r4, lr}
+ 884:	000c      	movs	r4, r1
+ 886:	2b22      	cmp	r3, #34	; 0x22
+ 888:	d80e      	bhi.n	8a8 <__itoa+0x28>
+ 88a:	2a0a      	cmp	r2, #10
+ 88c:	d005      	beq.n	89a <__itoa+0x1a>
+ 88e:	2100      	movs	r1, #0
+ 890:	1861      	adds	r1, r4, r1
+ 892:	f000 f885 	bl	9a0 <__utoa>
+ 896:	0020      	movs	r0, r4
+ 898:	bd10      	pop	{r4, pc}
+ 89a:	2800      	cmp	r0, #0
+ 89c:	daf7      	bge.n	88e <__itoa+0xe>
+ 89e:	232d      	movs	r3, #45	; 0x2d
+ 8a0:	4240      	negs	r0, r0
+ 8a2:	700b      	strb	r3, [r1, #0]
+ 8a4:	2101      	movs	r1, #1
+ 8a6:	e7f3      	b.n	890 <__itoa+0x10>
+ 8a8:	2300      	movs	r3, #0
+ 8aa:	2000      	movs	r0, #0
+ 8ac:	700b      	strb	r3, [r1, #0]
+ 8ae:	e7f3      	b.n	898 <__itoa+0x18>
 
-000008f4 <__utoa>:
- 8f4:	b5f0      	push	{r4, r5, r6, r7, lr}
- 8f6:	4646      	mov	r6, r8
- 8f8:	46d6      	mov	lr, sl
- 8fa:	464f      	mov	r7, r9
- 8fc:	b5c0      	push	{r6, r7, lr}
- 8fe:	b08a      	sub	sp, #40	; 0x28
- 900:	4690      	mov	r8, r2
- 902:	466a      	mov	r2, sp
- 904:	4b1d      	ldr	r3, [pc, #116]	; (97c <__utoa+0x88>)
- 906:	000d      	movs	r5, r1
- 908:	0006      	movs	r6, r0
- 90a:	cb13      	ldmia	r3!, {r0, r1, r4}
- 90c:	c213      	stmia	r2!, {r0, r1, r4}
- 90e:	cb13      	ldmia	r3!, {r0, r1, r4}
- 910:	c213      	stmia	r2!, {r0, r1, r4}
- 912:	cb13      	ldmia	r3!, {r0, r1, r4}
- 914:	c213      	stmia	r2!, {r0, r1, r4}
- 916:	781b      	ldrb	r3, [r3, #0]
- 918:	46ea      	mov	sl, sp
- 91a:	7013      	strb	r3, [r2, #0]
- 91c:	4643      	mov	r3, r8
- 91e:	3b02      	subs	r3, #2
- 920:	002f      	movs	r7, r5
- 922:	2400      	movs	r4, #0
- 924:	2b22      	cmp	r3, #34	; 0x22
- 926:	d901      	bls.n	92c <__utoa+0x38>
- 928:	e024      	b.n	974 <__utoa+0x80>
- 92a:	464c      	mov	r4, r9
- 92c:	1c63      	adds	r3, r4, #1
- 92e:	0030      	movs	r0, r6
- 930:	4641      	mov	r1, r8
- 932:	4699      	mov	r9, r3
- 934:	f7ff ff48 	bl	7c8 <__aeabi_uidivmod>
- 938:	4653      	mov	r3, sl
- 93a:	5c5b      	ldrb	r3, [r3, r1]
- 93c:	0030      	movs	r0, r6
- 93e:	703b      	strb	r3, [r7, #0]
- 940:	4641      	mov	r1, r8
- 942:	f7ff febb 	bl	6bc <__udivsi3>
- 946:	3701      	adds	r7, #1
- 948:	1e06      	subs	r6, r0, #0
- 94a:	d1ee      	bne.n	92a <__utoa+0x36>
- 94c:	464b      	mov	r3, r9
- 94e:	54e8      	strb	r0, [r5, r3]
- 950:	2300      	movs	r3, #0
- 952:	2c00      	cmp	r4, #0
- 954:	d007      	beq.n	966 <__utoa+0x72>
- 956:	5cea      	ldrb	r2, [r5, r3]
- 958:	5d29      	ldrb	r1, [r5, r4]
- 95a:	54e9      	strb	r1, [r5, r3]
- 95c:	552a      	strb	r2, [r5, r4]
- 95e:	3301      	adds	r3, #1
- 960:	3c01      	subs	r4, #1
- 962:	42a3      	cmp	r3, r4
- 964:	dbf7      	blt.n	956 <__utoa+0x62>
- 966:	0028      	movs	r0, r5
- 968:	b00a      	add	sp, #40	; 0x28
- 96a:	bc1c      	pop	{r2, r3, r4}
- 96c:	4690      	mov	r8, r2
- 96e:	4699      	mov	r9, r3
- 970:	46a2      	mov	sl, r4
- 972:	bdf0      	pop	{r4, r5, r6, r7, pc}
- 974:	702c      	strb	r4, [r5, #0]
- 976:	2000      	movs	r0, #0
- 978:	e7f6      	b.n	968 <__utoa+0x74>
- 97a:	46c0      	nop			; (mov r8, r8)
- 97c:	00000a7c 	.word	0x00000a7c
+000008b0 <itoa>:
+ 8b0:	b510      	push	{r4, lr}
+ 8b2:	f7ff ffe5 	bl	880 <__itoa>
+ 8b6:	bd10      	pop	{r4, pc}
 
-00000980 <wdtOSCRate>:
- 980:	00000000 000927c0 00100590 00155cc0     .....'.......\..
- 990:	001ab3f0 00200b20 00249f00 002932e0     .... . ...$..2).
- 9a0:	002dc6c0 00319750 003567e0 00393870     ..-.P.1..g5.p89.
- 9b0:	003d0900 00401640 00432380 004630c0     ..=.@.@..#C..0F.
- 9c0:	000002ad 000002d5 00000299 00000000     ................
+000008b8 <memcpy>:
+ 8b8:	b5f0      	push	{r4, r5, r6, r7, lr}
+ 8ba:	0005      	movs	r5, r0
+ 8bc:	2a0f      	cmp	r2, #15
+ 8be:	d92f      	bls.n	920 <memcpy+0x68>
+ 8c0:	000b      	movs	r3, r1
+ 8c2:	4303      	orrs	r3, r0
+ 8c4:	079b      	lsls	r3, r3, #30
+ 8c6:	d134      	bne.n	932 <memcpy+0x7a>
+ 8c8:	0016      	movs	r6, r2
+ 8ca:	000c      	movs	r4, r1
+ 8cc:	0003      	movs	r3, r0
+ 8ce:	3e10      	subs	r6, #16
+ 8d0:	0935      	lsrs	r5, r6, #4
+ 8d2:	3501      	adds	r5, #1
+ 8d4:	012d      	lsls	r5, r5, #4
+ 8d6:	1945      	adds	r5, r0, r5
+ 8d8:	6827      	ldr	r7, [r4, #0]
+ 8da:	601f      	str	r7, [r3, #0]
+ 8dc:	6867      	ldr	r7, [r4, #4]
+ 8de:	605f      	str	r7, [r3, #4]
+ 8e0:	68a7      	ldr	r7, [r4, #8]
+ 8e2:	609f      	str	r7, [r3, #8]
+ 8e4:	68e7      	ldr	r7, [r4, #12]
+ 8e6:	3410      	adds	r4, #16
+ 8e8:	60df      	str	r7, [r3, #12]
+ 8ea:	3310      	adds	r3, #16
+ 8ec:	429d      	cmp	r5, r3
+ 8ee:	d1f3      	bne.n	8d8 <memcpy+0x20>
+ 8f0:	230f      	movs	r3, #15
+ 8f2:	439e      	bics	r6, r3
+ 8f4:	3610      	adds	r6, #16
+ 8f6:	1985      	adds	r5, r0, r6
+ 8f8:	1989      	adds	r1, r1, r6
+ 8fa:	4013      	ands	r3, r2
+ 8fc:	2b03      	cmp	r3, #3
+ 8fe:	d91a      	bls.n	936 <memcpy+0x7e>
+ 900:	1f1e      	subs	r6, r3, #4
+ 902:	2300      	movs	r3, #0
+ 904:	08b4      	lsrs	r4, r6, #2
+ 906:	3401      	adds	r4, #1
+ 908:	00a4      	lsls	r4, r4, #2
+ 90a:	58cf      	ldr	r7, [r1, r3]
+ 90c:	50ef      	str	r7, [r5, r3]
+ 90e:	3304      	adds	r3, #4
+ 910:	42a3      	cmp	r3, r4
+ 912:	d1fa      	bne.n	90a <memcpy+0x52>
+ 914:	2403      	movs	r4, #3
+ 916:	43a6      	bics	r6, r4
+ 918:	1d33      	adds	r3, r6, #4
+ 91a:	4022      	ands	r2, r4
+ 91c:	18c9      	adds	r1, r1, r3
+ 91e:	18ed      	adds	r5, r5, r3
+ 920:	2a00      	cmp	r2, #0
+ 922:	d005      	beq.n	930 <memcpy+0x78>
+ 924:	2300      	movs	r3, #0
+ 926:	5ccc      	ldrb	r4, [r1, r3]
+ 928:	54ec      	strb	r4, [r5, r3]
+ 92a:	3301      	adds	r3, #1
+ 92c:	4293      	cmp	r3, r2
+ 92e:	d1fa      	bne.n	926 <memcpy+0x6e>
+ 930:	bdf0      	pop	{r4, r5, r6, r7, pc}
+ 932:	0005      	movs	r5, r0
+ 934:	e7f6      	b.n	924 <memcpy+0x6c>
+ 936:	001a      	movs	r2, r3
+ 938:	e7f2      	b.n	920 <memcpy+0x68>
+ 93a:	46c0      	nop			; (mov r8, r8)
+
+0000093c <strlen>:
+ 93c:	b510      	push	{r4, lr}
+ 93e:	0783      	lsls	r3, r0, #30
+ 940:	d025      	beq.n	98e <strlen+0x52>
+ 942:	7803      	ldrb	r3, [r0, #0]
+ 944:	2b00      	cmp	r3, #0
+ 946:	d024      	beq.n	992 <strlen+0x56>
+ 948:	0003      	movs	r3, r0
+ 94a:	2103      	movs	r1, #3
+ 94c:	e002      	b.n	954 <strlen+0x18>
+ 94e:	781a      	ldrb	r2, [r3, #0]
+ 950:	2a00      	cmp	r2, #0
+ 952:	d01a      	beq.n	98a <strlen+0x4e>
+ 954:	3301      	adds	r3, #1
+ 956:	420b      	tst	r3, r1
+ 958:	d1f9      	bne.n	94e <strlen+0x12>
+ 95a:	6819      	ldr	r1, [r3, #0]
+ 95c:	4a0e      	ldr	r2, [pc, #56]	; (998 <strlen+0x5c>)
+ 95e:	4c0f      	ldr	r4, [pc, #60]	; (99c <strlen+0x60>)
+ 960:	188a      	adds	r2, r1, r2
+ 962:	438a      	bics	r2, r1
+ 964:	4222      	tst	r2, r4
+ 966:	d106      	bne.n	976 <strlen+0x3a>
+ 968:	3304      	adds	r3, #4
+ 96a:	6819      	ldr	r1, [r3, #0]
+ 96c:	4a0a      	ldr	r2, [pc, #40]	; (998 <strlen+0x5c>)
+ 96e:	188a      	adds	r2, r1, r2
+ 970:	438a      	bics	r2, r1
+ 972:	4222      	tst	r2, r4
+ 974:	d0f8      	beq.n	968 <strlen+0x2c>
+ 976:	001a      	movs	r2, r3
+ 978:	781b      	ldrb	r3, [r3, #0]
+ 97a:	2b00      	cmp	r3, #0
+ 97c:	d003      	beq.n	986 <strlen+0x4a>
+ 97e:	3201      	adds	r2, #1
+ 980:	7811      	ldrb	r1, [r2, #0]
+ 982:	2900      	cmp	r1, #0
+ 984:	d1fb      	bne.n	97e <strlen+0x42>
+ 986:	1a10      	subs	r0, r2, r0
+ 988:	bd10      	pop	{r4, pc}
+ 98a:	1a18      	subs	r0, r3, r0
+ 98c:	e7fc      	b.n	988 <strlen+0x4c>
+ 98e:	0003      	movs	r3, r0
+ 990:	e7e3      	b.n	95a <strlen+0x1e>
+ 992:	2000      	movs	r0, #0
+ 994:	e7f8      	b.n	988 <strlen+0x4c>
+ 996:	46c0      	nop			; (mov r8, r8)
+ 998:	fefefeff 	.word	0xfefefeff
+ 99c:	80808080 	.word	0x80808080
+
+000009a0 <__utoa>:
+ 9a0:	b5f0      	push	{r4, r5, r6, r7, lr}
+ 9a2:	4646      	mov	r6, r8
+ 9a4:	46d6      	mov	lr, sl
+ 9a6:	464f      	mov	r7, r9
+ 9a8:	b5c0      	push	{r6, r7, lr}
+ 9aa:	b08a      	sub	sp, #40	; 0x28
+ 9ac:	4690      	mov	r8, r2
+ 9ae:	466a      	mov	r2, sp
+ 9b0:	4b1d      	ldr	r3, [pc, #116]	; (a28 <__utoa+0x88>)
+ 9b2:	000d      	movs	r5, r1
+ 9b4:	0006      	movs	r6, r0
+ 9b6:	cb13      	ldmia	r3!, {r0, r1, r4}
+ 9b8:	c213      	stmia	r2!, {r0, r1, r4}
+ 9ba:	cb13      	ldmia	r3!, {r0, r1, r4}
+ 9bc:	c213      	stmia	r2!, {r0, r1, r4}
+ 9be:	cb13      	ldmia	r3!, {r0, r1, r4}
+ 9c0:	c213      	stmia	r2!, {r0, r1, r4}
+ 9c2:	781b      	ldrb	r3, [r3, #0]
+ 9c4:	46ea      	mov	sl, sp
+ 9c6:	7013      	strb	r3, [r2, #0]
+ 9c8:	4643      	mov	r3, r8
+ 9ca:	3b02      	subs	r3, #2
+ 9cc:	002f      	movs	r7, r5
+ 9ce:	2400      	movs	r4, #0
+ 9d0:	2b22      	cmp	r3, #34	; 0x22
+ 9d2:	d901      	bls.n	9d8 <__utoa+0x38>
+ 9d4:	e024      	b.n	a20 <__utoa+0x80>
+ 9d6:	464c      	mov	r4, r9
+ 9d8:	1c63      	adds	r3, r4, #1
+ 9da:	0030      	movs	r0, r6
+ 9dc:	4641      	mov	r1, r8
+ 9de:	4699      	mov	r9, r3
+ 9e0:	f7ff ff48 	bl	874 <__aeabi_uidivmod>
+ 9e4:	4653      	mov	r3, sl
+ 9e6:	5c5b      	ldrb	r3, [r3, r1]
+ 9e8:	0030      	movs	r0, r6
+ 9ea:	703b      	strb	r3, [r7, #0]
+ 9ec:	4641      	mov	r1, r8
+ 9ee:	f7ff febb 	bl	768 <__udivsi3>
+ 9f2:	3701      	adds	r7, #1
+ 9f4:	1e06      	subs	r6, r0, #0
+ 9f6:	d1ee      	bne.n	9d6 <__utoa+0x36>
+ 9f8:	464b      	mov	r3, r9
+ 9fa:	54e8      	strb	r0, [r5, r3]
+ 9fc:	2300      	movs	r3, #0
+ 9fe:	2c00      	cmp	r4, #0
+ a00:	d007      	beq.n	a12 <__utoa+0x72>
+ a02:	5cea      	ldrb	r2, [r5, r3]
+ a04:	5d29      	ldrb	r1, [r5, r4]
+ a06:	54e9      	strb	r1, [r5, r3]
+ a08:	552a      	strb	r2, [r5, r4]
+ a0a:	3301      	adds	r3, #1
+ a0c:	3c01      	subs	r4, #1
+ a0e:	42a3      	cmp	r3, r4
+ a10:	dbf7      	blt.n	a02 <__utoa+0x62>
+ a12:	0028      	movs	r0, r5
+ a14:	b00a      	add	sp, #40	; 0x28
+ a16:	bc1c      	pop	{r2, r3, r4}
+ a18:	4690      	mov	r8, r2
+ a1a:	4699      	mov	r9, r3
+ a1c:	46a2      	mov	sl, r4
+ a1e:	bdf0      	pop	{r4, r5, r6, r7, pc}
+ a20:	702c      	strb	r4, [r5, #0]
+ a22:	2000      	movs	r0, #0
+ a24:	e7f6      	b.n	a14 <__utoa+0x74>
+ a26:	46c0      	nop			; (mov r8, r8)
+ a28:	00000c08 	.word	0x00000c08
+
+00000a2c <wdtOSCRate>:
+ a2c:	00000000 000927c0 00100590 00155cc0     .....'.......\..
+ a3c:	001ab3f0 00200b20 00249f00 002932e0     .... . ...$..2).
+ a4c:	002dc6c0 00319750 003567e0 00393870     ..-.P.1..g5.p89.
+ a5c:	003d0900 00401640 00432380 004630c0     ..=.@.@..#C..0F.
+ a6c:	000002ad 000002d5 00000299 00000000     ................
 	...
+ a8c:	000005c4 000005be 000005b8 000005b2     ................
+ a9c:	0000059e 000005ca                       ........
 
-000009e0 <OscRateIn>:
- 9e0:	00b71b00 72617453 20646574 0d0a7075     ....Started up..
- 9f0:	00000000 20534d42 72616548 61656274     ....BMS Heartbea
- a00:	000a0d74 20534d42 74617453 49203a65     t...BMS State: I
- a10:	0d74696e 0000000a 20534d42 63736944     nit.....BMS Disc
- a20:	67726168 65522065 6e6f7073 0a0d6573     harge Response..
- a30:	00000000 20534d42 6b636150 61745320     ....BMS Pack Sta
- a40:	00737574 20534d42 6c6c6543 6d655420     tus.BMS Cell Tem
- a50:	00007370 20534d42 6f727245 00007372     ps..BMS Errors..
- a60:	65726e55 6e676f63 64657a69 4e414320     Unrecognized CAN
- a70:	73656d20 65676173 00000000 33323130      message....0123
- a80:	37363534 62613938 66656463 6a696867     456789abcdefghij
- a90:	6e6d6c6b 7271706f 76757473 7a797877     klmnopqrstuvwxyz
- aa0:	00000000                                ....
+00000aa4 <OscRateIn>:
+ aa4:	00b71b00 20534d42 72616548 61656274     ....BMS Heartbea
+ ab4:	000a0d74 20534d42 74617453 49203a65     t...BMS State: I
+ ac4:	0d74696e 0000000a 20534d42 74617453     nit.....BMS Stat
+ ad4:	53203a65 646e6174 0a0d7962 00000000     e: Standby......
+ ae4:	20534d42 74617453 43203a65 67726168     BMS State: Charg
+ af4:	000a0d65 20534d42 74617453 42203a65     e...BMS State: B
+ b04:	6e616c61 00006563 20534d42 74617453     alance..BMS Stat
+ b14:	44203a65 68637369 65677261 00000000     e: Discharge....
+ b24:	20534d42 74617453 45203a65 726f7272     BMS State: Error
+ b34:	00000000 78656e55 74636570 42206465     ....Unexpected B
+ b44:	5320534d 65746174 6f59202e 68732075     MS State. You sh
+ b54:	646c756f 76656e20 72207265 68636165     ould never reach
+ b64:	72656820 00000065 20534d42 63736944      here...BMS Disc
+ b74:	67726168 65522065 6e6f7073 0a0d6573     harge Response..
+ b84:	00000000 20746f4e 64616552 00000079     ....Not Ready...
+ b94:	20534d42 6b636150 61745320 00737574     BMS Pack Status.
+ ba4:	20534d42 6c6c6543 6d655420 00007370     BMS Cell Temps..
+ bb4:	20534d42 6f727245 00007372 65726e55     BMS Errors..Unre
+ bc4:	6e676f63 64657a69 4e414320 73656d20     cognized CAN mes
+ bd4:	65676173 00000000 72617453 20646574     sage....Started 
+ be4:	0d0a7075 00000000 20534d42 20434f53     up......BMS SOC 
+ bf4:	63726550 61746e65 203a6567 00000000     Percentage: ....
+ c04:	00000a0d 33323130 37363534 62613938     ....0123456789ab
+ c14:	66656463 6a696867 6e6d6c6b 7271706f     cdefghijklmnopqr
+ c24:	76757473 7a797877 00000000              stuvwxyz....
