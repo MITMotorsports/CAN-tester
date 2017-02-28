@@ -8,6 +8,14 @@ typedef struct {
 } BMS_HEARTBEAT_T;
 
 /**
+ * @details returns a string of 64 bits representing the CAN message in msg_obj
+ *
+ * @param msg_obj datatype representing a CAN message
+ * @return a 64 bit string representing the CAN message in msg_obj
+ */
+uint64_t construct_64_bit_can_message(CCAN_MSG_OBJ_T * msg_obj);
+
+/**
  * @details translates a CCAN_MSG_OBJ_T into a BMS_HEARTBEAT_T
  *
  * @param bms_heartbeat datatype that is mutated to store data in msg_obj
