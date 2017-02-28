@@ -1,10 +1,9 @@
 #include "util.h"
 #include <string.h>
-#include "can.h"
 #include <stdlib.h>
-#include "can_constants.h"
 #include "can_utils.h"
-#include "ccand_11xx.h"
+#include "can.h"
+#include "can_constants.h"
 #include "board.h"
 
 /*****************************************************************************

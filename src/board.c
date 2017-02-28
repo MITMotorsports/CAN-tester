@@ -1,3 +1,5 @@
+#include "board.h"
+
 #include "chip.h"
 #include <string.h>
 
