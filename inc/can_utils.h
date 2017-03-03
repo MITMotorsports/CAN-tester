@@ -1,4 +1,8 @@
+#ifndef CAN_UTILS_H
+#define CAN_UTILS_H
+
 #include <stdint.h>
+
 #include "chip.h"
 #include "ccand_11xx.h"
 
@@ -33,4 +37,7 @@ typedef struct {
  * @param bms_discharge_response datatype that is mutated to store data in msg_obj
  * @param msg_obj datatype containing information about a CAN message
  */
-void CAN_MakeBMSDischargeResponse(BMS_DISCHARGE_RESPONSE_T * bms_discharge_response, CCAN_MSG_OBJ_T * msg_obj);
+void CAN_MakeBMSDischargeResponse(BMS_DISCHARGE_RESPONSE_T * bms_discharge_response, 
+		CCAN_MSG_OBJ_T * msg_obj);
+
+#endif //CAN_UTILS_H
