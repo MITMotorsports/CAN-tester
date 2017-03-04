@@ -78,6 +78,8 @@ void Process_CAN_Outputs(void) {
 		data[7] = 0x78;
 
 		CAN_Transmit(can_out_id, data, can_out_bytes);
+		Board_Print("TX error count: ");
+		Board_Println_Int(CAN_GetTxErrorCount(), 10);
 		Board_Println("Sent CAN message");
 		last_can_message_sent_time = msTicks;
 	}
