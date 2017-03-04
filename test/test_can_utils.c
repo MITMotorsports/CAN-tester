@@ -28,9 +28,26 @@
  */
 void constructBMSHeartbeatCANMessageObject(uint64_t state, uint64_t soc_percentage, CCAN_MSG_OBJ_T * msg_obj) {
 	msg_obj->mode_id = BMS_HEARTBEAT__id;
-	const uint32_t CAN_message_max_bit = 63;
-        msg_obj->data_64 = 0 |
-                (state << (CAN_message_max_bit - __BMS_HEARTBEAT__STATE__end)) |		(soc_percentage << (CAN_message_max_bit - __BMS_HEARTBEAT__SOC_PERCENTAGE__end));
+	
+	//put state and soc_percentage in msg_obj
+	uint32_t four_byte_number_max_bit = 31;
+	const uint32_t can_message_bytes_0_3 = 0 | 
+		( state << (four_byte_number_max_bit - __BMS_HEARTBEAT__STATE__end) ) |
+		( soc_percentage << 
+		(four_byte_number_max_bit - __BMS_HEARTBEAT__SOC_PERCENTAGE__end) );
+	const uint32_t byte_zero_mask = 0xFF;
+	const uint32_t max_byte_four_byte_number = 3;
+	const uint32_t bits_in_byte = 8;
+	uint32_t i;
+	for (i=0; i<=max_byte_four_byte_number; i++) {
+		msg_obj->data[i] = ( can_message_bytes_0_3 >> 
+			( (max_byte_four_byte_number - i)*bits_in_byte ) ) & 
+			byte_zero_mask;
+	}
+	const uint32_t can_message_max_byte = 7;
+	for (i=(max_byte_four_byte_number+1); i<=can_message_max_byte; i++) {
+		msg_obj->data[i] = 0;
+	}
 }
 
 
