@@ -8,7 +8,6 @@
 #include "ccand_11xx.h"
 #include "can_constants.h"
 #include "board.h"
-#include "util.h"
 
 //#define DEBUG
 

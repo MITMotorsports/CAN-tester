@@ -1,10 +1,9 @@
 #include "util.h"
 #include <string.h>
-#include "can.h"
 #include <stdlib.h>
-#include "can_constants.h"
 #include "can_utils.h"
-#include "ccand_11xx.h"
+#include "can.h"
+#include "can_constants.h"
 #include "board.h"
 
 /*****************************************************************************
@@ -304,8 +303,6 @@ int main(void) {
             		DEBUG_Print("Reset CAN peripheral. \r\n ");
             		reset_can_peripheral = false;
         	}
-
-		Board_Println("New iteration of main");
 
 		Process_CAN_Inputs();
 		Process_CAN_Outputs();
