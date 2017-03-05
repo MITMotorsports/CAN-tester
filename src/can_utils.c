@@ -118,11 +118,16 @@ void CAN_MakeBMSHeartbeat(BMS_HEARTBEAT_T * bms_heartbeat, CCAN_MSG_OBJ_T * msg_
 
 void CAN_MakeBMSDischargeResponse(BMS_DISCHARGE_RESPONSE_T * bms_discharge_response,
 		CCAN_MSG_OBJ_T * msg_obj) {
-        const uint32_t CAN_message_highest_bit = 63;
-        const uint64_t bms_discharge_response_mask = 0x8000000000000000;
-        uint64_t discharge_response = (msg_obj->data_64 & bms_discharge_response_mask) 
-		>> (CAN_message_highest_bit - 
+	uint32_t can_message = construct_32_bit_can_message_string_bytes_0_3(msg_obj);
+
+	//get state and soc
+	//TODO: don't hard code mask
+        const uint64_t bms_discharge_response_mask = 0x80000000;
+	const uint8_t four_byte_number_max_bit = 31;
+        uint64_t discharge_response = (can_message & bms_discharge_response_mask) 
+		>> (four_byte_number_max_bit - 
 		__BMS_DISCHARGE_RESPONSE__DISCHARGE_RESPONSE__end);
 
+	//construct BMS_DISCHARGE_RESPONSE_T
         bms_discharge_response->discharge_response = discharge_response;
 }

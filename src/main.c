@@ -1,6 +1,3 @@
-#include "util.h"
-#include <string.h>
-#include <stdlib.h>
 #include "can_utils.h"
 #include "can.h"
 #include "can_constants.h"
@@ -10,22 +7,9 @@
  * Private types/enumerations/variables
  ****************************************************************************/
 
-#define DEBUG 1
-
-#define LED_PORT 0
-#define LED_PIN 7
+#define DEBUG
 
 #define UART_RX_BUFFER_SIZE 1 
-
-#define DEBUG_ENABLE
-
-#ifdef DEBUG_ENABLE
-    #define DEBUG_Print(str) Chip_UART_SendBlocking(LPC_USART, str, strlen(str))
-    #define DEBUG_Write(str, count) Chip_UART_SendBlocking(LPC_USART, str, count)
-#else
-    #define DEBUG_Print(str)
-    #define DEBUG_Write(str, count) 
-#endif
 
 #define CONFIGURE_VCU_HEARTBEAT 'v'
 #define SEND_DISCHARGE_REQUEST 'd'
@@ -37,22 +21,19 @@
 
 #define BAUDRATE 115200
 
-#define CONFIGURE_VCU_HEARTBEAT_HELP_MESSAGE "Enter 's' to send VCU heartbeats with Standby state.\r\nEnter 'd' to send VCU heartbeats with Discharge state.\r\nEnter 'n' to stop sending VCU heartbeats.\r\n"
+#define CONFIGURE_VCU_HEARTBEAT_HELP_MESSAGE "Enter 's' to send VCU heartbeats with Standby state.\r\nEnter 'd' to send VCU heartbeats with Discharge state.\r\nEnter 'n' to stop sending VCU heartbeats."
 
-#define SEND_VCU_HEARTBEAT_STANDBY_MESSAGE "Sending VCU heartbeat with Stanby state\r\n"
-#define SEND_VCU_HEARTBEAT_DISCHARGE_MESSAGE "Sending VCU heartbeat with Discharge state\r\n"
-#define DONT_SEND_VCU_HEARTBEAT_MESSAGE "Not sending VCU heartbeat\r\n"
-#define UNRECOGNIZED_STATE_CONFIGURE_VCU_HEARTBEAT_MESSAGE "Unrecognized state. Please enter 's', 'd', or 'n'.\r\n"
+#define SEND_VCU_HEARTBEAT_STANDBY_MESSAGE "Sending VCU heartbeat with Stanby state"
+#define SEND_VCU_HEARTBEAT_DISCHARGE_MESSAGE "Sending VCU heartbeat with Discharge state"
+#define DONT_SEND_VCU_HEARTBEAT_MESSAGE "Not sending VCU heartbeat"
+#define UNRECOGNIZED_KEY_CONFIGURE_VCU_HEARTBEAT_MESSAGE "Unrecognized key. Please enter 's', 'd', or 'n'."
 
 const uint32_t OscRateIn = 12000000;
 
 volatile uint32_t msTicks;
 
 CCAN_MSG_OBJ_T rx_msg;
-uint8_t str[100];
 uint8_t uart_rx_buf[UART_RX_BUFFER_SIZE];
-
-uint8_t Rx_Buf[8];
 
 enum VCU_STATE {
 	STANDBY,
@@ -60,9 +41,11 @@ enum VCU_STATE {
 	NONE
 };
 
-enum VCU_STATE VCU_STATE_T = STANDBY;
+enum VCU_STATE current_vcu_state = STANDBY;
 
 uint32_t last_bms_heartbeat_time = 0; 
+
+bool reset_can_peripheral = false;
 
 /*****************************************************************************
  * Private function
@@ -78,15 +61,33 @@ void SysTick_Handler(void) {
  * @param soc_percentage state of charge, measured in percentage
  */
 static void print_soc_percentage(uint16_t soc_percentage) {
-	const uint8_t soc_digit_count = 8;
-        char soc_percentage_string[soc_digit_count];
         const uint8_t base_10 = 10;
 	
-	Board_Println("Just before printing SOC percentage. Expect new message soon");
-	itoa(soc_percentage, soc_percentage_string, base_10);
-        DEBUG_Print("BMS SOC Percentage: ");
-        DEBUG_Print(soc_percentage_string);
-        DEBUG_Print("\r\n");
+        Board_Print("BMS SOC Percentage: ");
+        Board_Println_Int(soc_percentage, base_10);
+}
+
+void process_can_return(uint32_t can_return) {
+	const uint8_t hex_base = 16;
+	if (can_return != NO_CAN_ERROR) {
+		Board_Print("CAN Error: ");
+		Board_Print_Int(can_return, hex_base);
+		Board_Print("    ");
+		Board_Println("Will attempt to reset CAN peripheral.");
+		reset_can_peripheral = true;
+	}
+}
+
+void process_can_errors(void) {
+	const uint8_t hex_base = 16;
+	const uint32_t can_error_status = CAN_GetErrorStatus();
+	if (can_error_status != 0) {
+		Board_Print("CAN Error: ");
+		Board_Print_Int(can_error_status, hex_base);
+		Board_Print("    ");
+		Board_Println("Will attempt to reset CAN peripheral.");
+		reset_can_peripheral = true;
+	}
 }
 
 /**
@@ -96,26 +97,31 @@ void sendVCUHeartbeat(void) {
 	const uint8_t byteLength = 8;
 	uint8_t data;
 	uint8_t length;
-	switch (VCU_STATE_T) {
+	uint32_t can_transmit_return;
+	switch (current_vcu_state) {
 		case STANDBY:
 			; //empty statement
 			data = ____VCU_HEARTBEAT__STATE__STANDBY << (byteLength - 1);
 			length = 1;
-			CAN_Transmit(VCU_HEARTBEAT__id, &data, length );
-			DEBUG_Print("Sent CAN message\r\n");
+			can_transmit_return = 
+				CAN_Transmit(VCU_HEARTBEAT__id, &data, length );
+			process_can_return(can_transmit_return);
+			process_can_errors();
 			break;
 		case DISCHARGE:
 			; //empty statement
 			data = ____VCU_HEARTBEAT__STATE__DISCHARGE << (byteLength - 1);
                         length = 1;
-                        CAN_Transmit(VCU_HEARTBEAT__id, &data, length );
-			DEBUG_Print("Sent CAN message\r\n");
+                        can_transmit_return = 
+				CAN_Transmit(VCU_HEARTBEAT__id, &data, length );
+			process_can_return(can_transmit_return);
+			process_can_errors();
 			break;
 		case NONE:
 			//Do nothing
 			break;
 		default:
-			DEBUG_Print("Invalid VCU state. Should never reach here\r\n");
+			Board_Println("Invalid VCU state. Should never reach here");
 			break;
 	}
 }
@@ -123,7 +129,7 @@ void sendVCUHeartbeat(void) {
 /**
  * @details reads incoming CAN messages and prints information to the terminal
  */
-void Process_CAN_Inputs(void) {	
+void process_can_inputs(void) {	
 	uint32_t ret;
 	BMS_HEARTBEAT_T bms_heartbeat;
 	BMS_DISCHARGE_RESPONSE_T bms_discharge_response;
@@ -133,133 +139,124 @@ void Process_CAN_Inputs(void) {
         if (ret == NO_CAN_ERROR) {
         	switch (rx_msg.mode_id) {
                 	case BMS_HEARTBEAT__id:
-				Board_Println("Entered case BMS_HEARTBEAT__id");
-                        	DEBUG_Print("BMS Heartbeat\r\n");
-				if (DEBUG) {
-					char data[100];
-					itoa(rx_msg.data_64, data, 2);
-					DEBUG_Print("rx_msg.data_64: ");
-					DEBUG_Print(data);
-					DEBUG_Print("\r\n");
-					DEBUG_Print("rx_msg.data[0]: ");
-					itoa(rx_msg.data[0], data, 2);
-					DEBUG_Print(data);
-					DEBUG_Print("\r\n");
-				}
+                        	Board_Print("BMS Heartbeat:    ");
                         	CAN_MakeBMSHeartbeat(&bms_heartbeat, &rx_msg);
                         	switch (bms_heartbeat.state) {
                                 	case ____BMS_HEARTBEAT__STATE__INIT:
-                                        	DEBUG_Print("BMS State: Init\r\n");
+                                        	Board_Print("BMS State: Init    ");
                                                 print_soc_percentage(bms_heartbeat.soc_percentage);
                                                 break;
                                         case ____BMS_HEARTBEAT__STATE__STANDBY:
-                                                DEBUG_Print("BMS State: Standby\r\n");
+                                                Board_Print("BMS State: Standby    ");
                                                 print_soc_percentage(bms_heartbeat.soc_percentage);
                                                 break;
                                         case ____BMS_HEARTBEAT__STATE__CHARGE:
-                                                DEBUG_Print("BMS State: Charge\r\n");
+                                                Board_Print("BMS State: Charge    ");
                                                 print_soc_percentage(bms_heartbeat.soc_percentage);
                                                 break;
                                	        case ____BMS_HEARTBEAT__STATE__BALANCE:
-                                                DEBUG_Print("BMS State: Balance\r\n");
+                                                Board_Print("BMS State: Balance    ");
                                                 print_soc_percentage(bms_heartbeat.soc_percentage);
                                                 break;
                                         case ____BMS_HEARTBEAT__STATE__DISCHARGE:
-                                                DEBUG_Print("BMS State: Discharge\r\n");
+                                                Board_Print("BMS State: Discharge    ");
                                                 print_soc_percentage(bms_heartbeat.soc_percentage);
                                                 break;
                                         case ____BMS_HEARTBEAT__STATE__ERROR:
-                                                DEBUG_Print("BMS State: Error\r\n");
+                                                Board_Print("BMS State: Error    ");
                                                 print_soc_percentage(bms_heartbeat.soc_percentage);
                                                 break;
                                         default:
-                                                DEBUG_Print("Unexpected BMS State. You should never reach here\r\n");
+                                                Board_Print("Unexpected BMS State. You should never reach here");
                                                 break;
                                 }
                         	break;
 
 			case BMS_DISCHARGE_RESPONSE__id:
-                        	DEBUG_Print("BMS Discharge Response\r\n");
+                        	Board_Print("BMS Discharge Response    ");
                       	        CAN_MakeBMSDischargeResponse(&bms_discharge_response, &rx_msg);
                                 switch (bms_discharge_response.discharge_response) {
 	                                case ____BMS_DISCHARGE_RESPONSE__DISCHARGE_RESPONSE__NOT_READY:
-                                        	DEBUG_Print("Not Ready\r\n");
+                                        	Board_Println("Not Ready");
                                                 break;
                                         case ____BMS_DISCHARGE_RESPONSE__DISCHARGE_RESPONSE__READY:
-                                                DEBUG_Print("Ready\r\n");
+                                                Board_Println("Ready");
                                                 break;
                                         }
                                         break;
 
                         case BMS_PACK_STATUS__id:
-        	                DEBUG_Print("BMS Pack Status\r\n");
+        	                Board_Println("BMS Pack Status");
        	                        //TODO
                                 break;
                         case BMS_CELL_TEMPS__id:
-                                DEBUG_Print("BMS Cell Temp\r\n");
+                                Board_Println("BMS Cell Temp");
                                 //TODO
                        	        break;
                         case BMS_ERRORS__id:
-                                DEBUG_Print("BMS Errors\r\n");
+                                Board_Println("BMS Errors");
                                 //TODO
                                 break;
                         default:
-                        	DEBUG_Print("Unrecognized CAN message\r\n");
+                        	Board_Println("Unrecognized CAN message");
 		}
-		Board_Println("Finished processing CAN message");
+	} else if (ret == NO_RX_CAN_MESSAGE) {
+		// Do nothing	
+	} else {
+		process_can_return(ret);
 	}
+	process_can_errors();
 }
 
-/**
- * Transmits CAN messages
- */
-void Process_CAN_Outputs(void) {
+void process_keyboard_input(void) {
 	uint8_t count;
 	count = Chip_UART_Read(LPC_USART, uart_rx_buf, UART_RX_BUFFER_SIZE);
 	if (count != 0) {
 		Chip_UART_SendBlocking(LPC_USART, uart_rx_buf, count);
-		DEBUG_Print("\r\n");
+		Board_Print("\r\n");
 		switch (uart_rx_buf[0]) {
 			case CONFIGURE_VCU_HEARTBEAT:
-				DEBUG_Print(CONFIGURE_VCU_HEARTBEAT_HELP_MESSAGE);
+				Board_Println(CONFIGURE_VCU_HEARTBEAT_HELP_MESSAGE);
 				count = Chip_UART_ReadBlocking(LPC_USART, uart_rx_buf, UART_RX_BUFFER_SIZE);
 				Chip_UART_SendBlocking(LPC_USART, uart_rx_buf, count);
-				DEBUG_Print("\r\n");
+				Board_Print("\r\n");
 				switch (uart_rx_buf[0]) {
 					case SEND_STANDBY_VCU_HEARTBEAT:
-						VCU_STATE_T = STANDBY;
-						DEBUG_Print(SEND_VCU_HEARTBEAT_STANDBY_MESSAGE);
+						current_vcu_state = STANDBY;
+						Board_Println(SEND_VCU_HEARTBEAT_STANDBY_MESSAGE);
 						break;
 					case SEND_DISCHARGE_VCU_HEARTBEAT:
-						VCU_STATE_T = DISCHARGE;
-						DEBUG_Print(SEND_VCU_HEARTBEAT_DISCHARGE_MESSAGE);
+						current_vcu_state = DISCHARGE;
+						Board_Println(SEND_VCU_HEARTBEAT_DISCHARGE_MESSAGE);
 						break;
 					case DONT_SEND_VCU_HEARTBEAT:
-						VCU_STATE_T = NONE;
-						DEBUG_Print(DONT_SEND_VCU_HEARTBEAT_MESSAGE);
+						current_vcu_state = NONE;
+						Board_Println(DONT_SEND_VCU_HEARTBEAT_MESSAGE);
 						break;
 					default:
-						DEBUG_Print(UNRECOGNIZED_STATE_CONFIGURE_VCU_HEARTBEAT_MESSAGE);
+						Board_Println(UNRECOGNIZED_KEY_CONFIGURE_VCU_HEARTBEAT_MESSAGE);
 						break;
 				}
 				break;
 			case SEND_DISCHARGE_REQUEST:
 				; //empty statement
-				uint8_t discharge_request_bit_position = 7;
+				const uint8_t discharge_request_bit_position = 7;
 				uint8_t data = ____VCU_DISCHARGE_REQUEST__DISCHARGE_REQUEST__ENTER_DISCHARGE << discharge_request_bit_position;
-				uint8_t length = 1;
+				const uint8_t length = 1;
 				CAN_Transmit(VCU_DISCHARGE_REQUEST__id, &data, length);
-				DEBUG_Print("Sent discharge request\r\n");
+				Board_Println("Sent discharge request");
 				break;
 			case HELP:
-				DEBUG_Print("Enter 'v' to configure VCU heartbeat. Enter 'd' to send discharge request.\r\n");
+				Board_Println("Enter 'v' to configure VCU heartbeat. Enter 'd' to send discharge request.");
 				break;
 			default:
-				DEBUG_Print("unrecognized key\r\n");
+				Board_Println("unrecognized key");
 				break;
 		}
 	}
+}
 
+void process_can_outputs(void) {
 	//Send BMS heartbeat every second
 	const uint16_t one_second = 1000;
 	if (msTicks - last_bms_heartbeat_time > one_second) {
@@ -272,17 +269,14 @@ int main(void) {
 
 	SystemCoreClockUpdate();
 
-	uint32_t reset_can_peripheral_time;
-	bool reset_can_peripheral = false;
-
 	if (SysTick_Config (SystemCoreClock / 1000)) {
+		Board_Println("Failed SysTick_Config");
 		//Error
 		while(1);
 	}
 
 	Chip_IOCON_PinMuxSet(LPC_IOCON, IOCON_PIO1_6, (IOCON_FUNC1 | IOCON_MODE_INACT)); /* RXD */
 	Chip_IOCON_PinMuxSet(LPC_IOCON, IOCON_PIO1_7, (IOCON_FUNC1 | IOCON_MODE_INACT)); /* TXD */
-	
 	Chip_UART_Init(LPC_USART);
 	Chip_UART_SetBaud(LPC_USART, BAUDRATE);
 	// Configure data width, parity, and stop bits
@@ -290,22 +284,23 @@ int main(void) {
 	Chip_UART_SetupFIFOS(LPC_USART, (UART_FCR_FIFO_EN | UART_FCR_TRG_LEV2));
 	Chip_UART_TXEnable(LPC_USART);
 
-	DEBUG_Print("Started up\n\r");
-	DEBUG_Print("Enter 'h' for help\r\n");
-
 	CAN_Init(500000);
 
+	Board_Println("Started up");
+	Board_Println("Enter 'h' for help");
+
 	while (1) {
-       		 if(reset_can_peripheral && msTicks > reset_can_peripheral_time) {
-            		DEBUG_Print("Attempting to reset CAN peripheral...\r\n ");
+       		if(reset_can_peripheral) {
+            		Board_Println("Attempting to reset CAN peripheral...");
             		CAN_ResetPeripheral();
             		CAN_Init(500000);
-            		DEBUG_Print("Reset CAN peripheral. \r\n ");
+            		Board_Println("Reset CAN peripheral.");
             		reset_can_peripheral = false;
         	}
 
-		Process_CAN_Inputs();
-		Process_CAN_Outputs();
+		process_can_inputs();
+		process_keyboard_input();
+		process_can_outputs();
 
 	}
 }

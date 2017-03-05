@@ -102,11 +102,15 @@ void test_CAN_MakeBMSHeartbeat_OneBitsLeftmostAndRightmostSide(void) {
  * @param discharge_response discharge response
  * @param msg_obj CAN message object that is mutated to represent the input
  */
-void constructDischargeResponseCANMessageObject(uint64_t discharge_response, CCAN_MSG_OBJ_T * msg_obj) {
+void constructDischargeResponseCANMessageObject(uint64_t discharge_response, 
+		CCAN_MSG_OBJ_T * msg_obj) {
         msg_obj->mode_id = BMS_DISCHARGE_RESPONSE__id;
-        const uint32_t CAN_message_max_bit = 63;
-        msg_obj->data_64 = 0 |
-                (discharge_response << (CAN_message_max_bit - __BMS_DISCHARGE_RESPONSE__DISCHARGE_RESPONSE__end));
+	const uint8_t bits_in_byte = 8;
+	msg_obj->data[0] = discharge_response << (bits_in_byte - 1);
+	uint8_t i;
+	for (i=1; i<bits_in_byte; i++) {
+		msg_obj->data[i] = 0;
+	}
 }
 
 /**
